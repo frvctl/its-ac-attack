@@ -29,7 +29,7 @@ intend to implement are as follows:
 		</ul>
 	</ul>
 
-## TODO List:
+### TODO List:
 	
 		* Establish an effective user authorization system 
 	    * Get all of the views and routes working properly 
