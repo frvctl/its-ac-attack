@@ -29,11 +29,11 @@ intend to implement are as follows:
 		</ul>
 	</ul>
 
-### TODO List:
-	<ul>
-		<li> Establish an effective user authorization system </li>
-	    <li> Get all of the views and routes working properly </li>
-	    <li> Get the JSON of questions from Kevin and work on the search function </li>
-	    <li> Create a suitable chat application as a standalone application using Socket.io, Express, and Node </li>
-	    <li> Figure out what I am going to use for a server and how to go about setting that up and using it </li>
-	</ul>
+## TODO List:
+	
+		* Establish an effective user authorization system 
+	    * Get all of the views and routes working properly 
+	    * Get the JSON of questions from Kevin and work on the search function 
+	    * Create a suitable chat application as a standalone application using Socket.io, Express, and Node 
+	    * Figure out what I am going to use for a server and how to go about setting that up and using it 
+	
