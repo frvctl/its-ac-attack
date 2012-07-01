@@ -1,0 +1,21 @@
+!!!
+html(ng-app="myApp")
+  head
+    link(rel='stylesheet', href='stylesheets/style.css')
+    link(rel='stylesheet', href='stylesheets/bootstrap.css')
+    script(src='http://code.angularjs.org/1.0.1/angular-1.0.1.min.js')
+    meta(charset='utf8')
+    base(href='/')
+    title Angular Express Seed App
+    div.navbar.navbar-fixed-top
+      div.navbar-inner
+        div.container
+          a(href='#')#logo Quiz Bowl Database
+          ul.nav.pull-right
+            li
+              a(href='/') Home
+            li
+              a(href='/search') Search
+            li
+              a(href='/contact') Contact
+  body!= body
