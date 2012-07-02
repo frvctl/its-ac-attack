@@ -4,28 +4,32 @@
  */
 
 exports.index = function(req, res){
-  res.render('static_pages/home');
+  res.render('static_pages/home', {title: "Home"});
 };
 
 exports.search = function(req, res){
-    res.render('db_interaction/search');
+    res.render('domain/search', {title: "Search"});
 };
 
 exports.partials = function(req, res){
 	var name = req.params.name;
-	res.render('partials/' + name);
+	res.render('partials/' + name, {title: " " + name});
 };
 
 exports.contact = function(req, res){
-    res.render('static_pages/contact');
+    res.render('static_pages/contact', {title: "Contact"});
+};
+
+exports.about = function(req, res){
+	res.render('static_pages/about', {title: "About"});
 };
 
 exports.login = function(req, res){
-    res.render('authentication/login');
+    res.render('user/login', {title: "Login"});
 };
 
 exports.signup = function(req, res){
-    res.render('authentication/signup');
+    res.render('user/signup', {title: "Sign up"});
 };
 
 exports.logout = function(req, res){

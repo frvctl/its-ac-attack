@@ -6,7 +6,7 @@ html(ng-app="myApp")
     script(src='http://code.angularjs.org/1.0.1/angular-1.0.1.min.js')
     meta(charset='utf8')
     base(href='/')
-    title Angular Express Seed App
+    title= title
     div.navbar.navbar-fixed-top
       div.navbar-inner
         div.container
@@ -19,3 +19,12 @@ html(ng-app="myApp")
             li
               a(href='/contact') Contact
   body!= body
+  footer.footer
+    small
+      a(href='http://inducinginsanity.blogspot.com') It's Ac Attack Blog by Ben Vest 
+    nav
+      ul
+        li
+          a(href='/about') About
+        li
+          a(href='/contact') Contact Me

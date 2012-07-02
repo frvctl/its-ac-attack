@@ -6,7 +6,7 @@ html{
 }
 
 body{
-    padding-top: 60px;
+    padding: 60px 100px;
 }
 
 section{
@@ -69,4 +69,45 @@ p {
 #logo:hover {
     color: #fff;
     text-decoration: none;
+}
+
+/* Footer */
+
+footer{
+    margin-top: 45px;
+    padding-top: 5px;
+    border-top: 1px solid #eaeaea;
+    color: #999;
+}
+
+footer a{
+    color: #555;
+}
+
+footer a:hover{
+    color: #222;
+}
+
+footer small{
+    float: left;
+}
+
+footer ul{
+    float: right;
+    list-style: none;
+}
+
+footer ul li{
+    float:right;
+    margin-left: 10px;
+}
+
+/* Forms */
+
+input, textarea, select, .undeditable-input  {
+    border: 1px solid #bbb;
+    width: 100%;
+    padding: 10px;
+    height: auto;
+    margin-bottom:15px;
 }
