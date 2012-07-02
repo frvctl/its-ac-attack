@@ -3,6 +3,13 @@ var Article = mongoose.model('Article')
 
 
 module.exports = function(app){
+
+  app.get('/search', function(req, res){
+    res.render('questions/search', {
+      title: 'Search'
+    });
+  });
+  
   app.param('articleId', function(req, res, next, id){
     Article
       .findOne({ _id : id })
