@@ -92,14 +92,6 @@ UserSchema.plugin(mongooseAuth, {
 });
 
 // validations
-UserSchema.path('twitter.name.full').validate(function(name){
-  return name.trim().split(' ').length >= 2;
-}, 'Please provide your full name');
-
-UserSchema.path('twitter.email').validate(function (email) {
-  return /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/i.test(email);
-}, 'Please provide a proper email');
-
 UserSchema.path('fb.name.full').validate(function (name) {
   return name.trim().split(' ').length >= 2;
 }, 'Please provide your fullname');
