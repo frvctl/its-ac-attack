@@ -29,22 +29,29 @@ intend to implement are as follows:
     </ul>
   </ul>
 
-### TODO List:
-  
-      * Establish an effective user authorization system 
-          * Through Social Media
-            * Twitter
-            * Google
-            * ~~Facebook~~*
-          * Standard Login
-      * ~~Get all of the views and routes working properly~~ 
-      * ~~Get the JSON of questions from Kevin and work on the search function~~ 
-      * Create a suitable chat application as a standalone application using Socket.io, Express, and Node 
-      * ~~Figure out what I am going to use for a server and how to go about setting that up and using it~~
-      * Core Features
-          * Implement the Search Function
-          * Create an ability to read out questions
-          * Be able to select difficulty and/or where the question comes from
-          * After that establish the ability for multiple people to see the same question and answer it, --multiplayer mode--
-          * Implement the chat
-  
+## Todo List:
+
+<ul>
+  <li> Establish an effective user authorization system </li>
+    <ul>
+      <li> Through Social Media </li>
+        <ul>
+          <li> Twitter </li>
+          <li> Google </li>
+          <li><del> Facebook </del></li>
+        </ul>
+      <li> Standard Login </li>
+    </ul>
+    <li><del>Get all of the views and routes working properly </del></li> 
+    <li><del>Get the JSON of questions from Kevin and work on the search function</del></li>
+    <li> Create a suitable chat application as a standalone application using Socket.io, Express, and Node </li> 
+    <li><del>Figure out what I am going to use for a server and how to go about setting that up and using it</del></li>
+    <li>Core Features</li>
+      <ul>
+          <li> Implement the Search Function </li>
+          <li>Create an ability to read out questions </li>
+          <li> Be able to select difficulty and/or where the question comes from </li>
+          <li> After that establish the ability for multiple people to see the same question and answer it --multiplayer mode-- </li>
+          <li> Implement the chat </li>
+      </ul>
+</ul>
