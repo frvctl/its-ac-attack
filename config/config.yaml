@@ -25,8 +25,8 @@ staging:
     host_uri: "http://localhost:3000"
 production:
   db:
-    uri: ""
+    uri: "mongodb://Morghra:jewlawl5@ds033767.mongolab.com:33767/its-ac-attack_production"
   facebook:
-    appId: "202263326537254"
-    appSecret: "f12d943a863da7bd6d27823355769ec5"
-    host_uri: ""
+    appId: "461813053838465"
+    appSecret: "c152ce37e26ac7cb9c757c412354349e"
+    host_uri: "http://its-ac-attack.herokuapp.com"
