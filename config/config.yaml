@@ -4,18 +4,15 @@ development:
   facebook:
     appId: "461813053838465"
     appSecret: "c152ce37e26ac7cb9c757c412354349e"
-    redirectPath: "/"
-
+    redirectPath: "localhost:3000"
   twitter:
     appId: "1O7Wni1HOmTowvNVn9cXqw"
     appSecret: "x6WmEPNyAF1YFvnEFZvnsJ3rCNeGCc6rMIGWcg8pKQ"
     host_uri: "http://localhost:3000"
-
   github:
     appId: "**ITSACATTACKID**"
     appSecret: "**ITSACATTACKID**"
     host_uri: "http://localhost:3000"
-
 staging:
   db:
     uri: "mongodb://localhost/noobjs_staging"
