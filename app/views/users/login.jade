@@ -1,9 +1,13 @@
-div.center
-  ul
-    li 
-      a(href='/auth/facebook').btn.btn-large.btn-primary Login Using Facebook
-    li
-      a(href='/auth/twitter').btn.btn-large.btn-primary Login Using Twitter
-    li
-      a(href='/auth/google').btn.btn-large.btn-primary Login Using Google
+form.form-horizontal
+  div.control-group
+    label(for='input1').control-label Text Input
+    div.controls
+      input(type='text', id='input1').input-xlarge
+      p.help-block BlahBlahBlah
 
+form.center.form-inline
+      a(href='/auth/facebook')
+        img(src='/images/facebook.png') 
+
+      a(href='/auth/twitter')
+        img(src='/images/twitter.png') 
