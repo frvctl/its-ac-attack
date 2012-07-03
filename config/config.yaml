@@ -25,8 +25,8 @@ staging:
     host_uri: "http://localhost:3000"
 production:
   db:
-    uri: "mongodb://nodejs:nodejs@staff.mongohq.com:10045/app2591449"
+    uri: ""
   facebook:
     appId: "202263326537254"
     appSecret: "f12d943a863da7bd6d27823355769ec5"
-    host_uri: "http://nodejs-express-demo.herokuapp.com"
+    host_uri: ""
