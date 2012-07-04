@@ -97,7 +97,7 @@ UserSchema.plugin(mongooseAuth, {
           consumerKey: config.twitter.consumerKey,
           consumerSecret: config.twitter.consumerSecret,
           redirectPath: '/',
-          findOrCreateUser: function (sess, accessTok, accessTokenSecret, twitterUser) {
+          findOrCreateUser: function (sess, accessTok, accessTokSecret, twitterUser) {
             var promise = this.Promise(),
                 User = this.User()();
             // TODO Check user in session or request helper first
