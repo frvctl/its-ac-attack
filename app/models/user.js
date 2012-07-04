@@ -60,7 +60,7 @@ UserSchema.plugin(mongooseAuth, {
 
               user = new User({
                   fb: {
-                      id: fbUser.id,Secret
+                      id: fbUser.id,
                       accessToken: accessTok,
                       expires: expiresDate,
                       name: {
