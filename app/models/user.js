@@ -60,7 +60,7 @@ UserSchema.plugin(mongooseAuth, {
 
               user = new User({
                   fb: {
-                      id: fbUser.id,
+                      id: fbUser.id,Secret
                       accessToken: accessTok,
                       expires: expiresDate,
                       name: {
@@ -110,7 +110,7 @@ UserSchema.plugin(mongooseAuth, {
               console.log("CREATING");
 
               var expiresDate = new Date;
-              expiresDate.setSeconds(expiresDate.getSeconds() + accessTokExtra);
+              expiresDate.setSeconds(expiresDate.getSeconds() + accessTokSecret);
 
               user = new User({
                   twitter: {
