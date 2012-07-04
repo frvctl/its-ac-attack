@@ -1,3 +1,8 @@
 form.center.well.form-search
 	input(type='text').input-medium.search-query
 	button(type='submit').btn.btn-primary Search
+
+	- each question in questions
+	  div.question
+	  	div.category= search.category
+	  

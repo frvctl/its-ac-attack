@@ -9,16 +9,16 @@ development:
     consumerKey: "1O7Wni1HOmTowvNVn9cXqw"
     consumerSecret: "x6WmEPNyAF1YFvnEFZvnsJ3rCNeGCc6rMIGWcg8pKQ"
     host_uri: "http://localhost:3000"
-  github:
-    appId: "**ITSACATTACKID**"
-    appSecret: "**ITSACATTACKID**"
-    host_uri: "http://localhost:3000"
 staging:
   db:
     uri: "mongodb://localhost/noobjs_staging"
   facebook:
     appId: "202263326537254"
     appSecret: "f12d943a863da7bd6d27823355769ec5"
+    host_uri: "http://localhost:3000"
+  twitter:
+    consumerKey: "1O7Wni1HOmTowvNVn9cXqw"
+    consumerSecret: "x6WmEPNyAF1YFvnEFZvnsJ3rCNeGCc6rMIGWcg8pKQ"
     host_uri: "http://localhost:3000"
 production:
   db:
