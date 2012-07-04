@@ -104,9 +104,9 @@ UserSchema.plugin(mongooseAuth, {
                //      e.g., req.user or sess.auth.userId
             User.findOne({'twitter.id': twitterUser.id}, function (err, foundUser) {
               if (err) return promise.fail(err);
-              if (foundUser) {
-                return promise.fulfill(foundUser);
-              }
+            //  if (foundUser) {
+            //    return promise.fulfill(foundUser);  //TODO ADD UPDATING via sessions
+            //  }
               console.log("CREATING TWITTER USER");
 
               var expiresDate = new Date;
@@ -123,7 +123,7 @@ UserSchema.plugin(mongooseAuth, {
                       locale: twitterUser.locale,
                       updatedTime: twitterUser.updated_time
                   },
-                  profileUrl: "http:\/\/twitter.com\/#!\/" + twitterUser.sceen_name ,
+                  profileUrl: "http:\/\/twitter.com\/" + twitterUser.screen_name,
                   bio: twitterUser.description,
                   location: twitterUser.location
                   
