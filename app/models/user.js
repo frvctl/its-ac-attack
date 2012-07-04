@@ -68,7 +68,7 @@ UserSchema.plugin(mongooseAuth, {
                           first: fbUser.first_name,
                           last: fbUser.last_name
                       },
-                      alias: fbUser.link.match(/^http:\/\/www.facebook\.com\/(.+)/)[1],
+                      alias: fbUser.fbAlias,
                       gender: fbUser.gender,
                       email: fbUser.email,
                       timezone: fbUser.timezone,
@@ -117,23 +117,16 @@ UserSchema.plugin(mongooseAuth, {
                       id: twitterUser.id,
                       accessToken: accessTok,
                       expires: expiresDate,
-                      name: {
-                          full: twitterUser.name,
-                          first: twitterUser.first_name,
-                          last: twitterUser.last_name
-                      },
-                      alias: twitterUser.screenName,
-                      gender: twitterUser.gender,
-                      email: twitterUser.email,
+                      name: twitterUser.name,
+                      alias: twitterUser.screen_name,
                       timezone: twitterUser.timezone,
                       locale: twitterUser.locale,
                       updatedTime: twitterUser.updated_time
                   },
-                  profileUrl: "http:\/\/twitter.com\/#!\/" + twitterUser.sceenName ,
+                  profileUrl: "http:\/\/twitter.com\/#!\/" + twitterUser.sceen_name ,
                   bio: twitterUser.description,
-                  location: {
-                    name: twitterUser.location && twitterUser.location.name ? twitterUser.location.name : ''
-                  }
+                  location: twitterUser.location
+                  
               });
 
               user.save( function (err, savedUser) {
