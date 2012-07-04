@@ -1,8 +1,10 @@
 form.center.well.form-search
-	input(type='text').input-medium.search-query
-	button(type='submit').btn.btn-primary Search
-
-	- each question in questions
-	  div.question
-	  	div.category= search.category
-	  
+  input(type='text', ng-model="search-query", placeholder="E.g. 'Dickens'").input-medium.search-query
+  button(type='submit').btn.btn-primary Search
+ 
+  each item in questions
+      ul
+        li= item._id
+        li= item.category
+        li= item.question
+        li= item.answer
