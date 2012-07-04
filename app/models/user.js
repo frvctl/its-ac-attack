@@ -75,7 +75,7 @@ UserSchema.plugin(mongooseAuth, {
                       locale: fbUser.locale,
                       updatedTime: fbUser.updated_time
                   },
-                  fbProfileUrl: fbUser.link,
+                  profileUrl: fbUser.link,
                   bio: fbUser.bio,
                   location: {
                     name: fbUser.location && fbUser.location.name ? fbUser.location.name : ''
@@ -97,11 +97,11 @@ UserSchema.plugin(mongooseAuth, {
           consumerKey: config.twitter.consumerKey,
           consumerSecret: config.twitter.consumerSecret,
           redirectPath: '/',
-          findOrCreateUser: function (sess, accessTok, accessTokenSecret, twitterUserMetadata) {
+          findOrCreateUser: function (sess, accessTok, accessTokenSecret, twitterUser) {
             var promise = this.Promise(),
                 User = this.User()();
             // TODO Check user in session or request helper first
-            //      e.g., req.user or sess.auth.userId
+               //      e.g., req.user or sess.auth.userId
             User.findOne({'twitter.id': twitterUser.id}, function (err, foundUser) {
               if (err) return promise.fail(err);
               if (foundUser) {
@@ -129,7 +129,7 @@ UserSchema.plugin(mongooseAuth, {
                       locale: twitterUser.locale,
                       updatedTime: twitterUser.updated_time
                   },
-                  fbProfileUrl: twitterUser.link,
+                  profileUrl: twitterUser.link,
                   bio: twitterUser.bio,
                   location: {
                     name: twitterUser.location && twitterUser.location.name ? twitterUser.location.name : ''
