@@ -4,10 +4,10 @@ development:
   facebook:
     appId: "461813053838465"
     appSecret: "c152ce37e26ac7cb9c757c412354349e"
-    redirectPath: "localhost:3000"
+    host_uri: "localhost:3000"
   twitter:
-    appId: "1O7Wni1HOmTowvNVn9cXqw"
-    appSecret: "x6WmEPNyAF1YFvnEFZvnsJ3rCNeGCc6rMIGWcg8pKQ"
+    consumerKey: "1O7Wni1HOmTowvNVn9cXqw"
+    consumerSecret: "x6WmEPNyAF1YFvnEFZvnsJ3rCNeGCc6rMIGWcg8pKQ"
     host_uri: "http://localhost:3000"
   github:
     appId: "**ITSACATTACKID**"

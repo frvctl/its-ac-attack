@@ -1,7 +1,7 @@
-var exports = module.exports = everyauth = require('everyauth')
-  , Promise = everyauth.Promise
-  , UserSchema = new Schema({})
-  , User
+var exports = module.exports = everyauth = require('everyauth'),
+    Promise = everyauth.Promise,
+    UserSchema = new Schema({}),
+    User;
 
 
 var exports = module.exports = mongooseAuth = require('mongoose-auth');
@@ -11,8 +11,10 @@ everyauth.debug = true;
 // This is how you request permissions
 everyauth.facebook.scope('email, user_about_me, user_location');
 
+
 // Eleminate timeout completely
 everyauth.facebook.moduleTimeout(-1);
+everyauth.twitter.moduleTimeout(-1);
 
 // To see all the configurable options
 // console.log(everyauth.facebook.configurable())
@@ -22,7 +24,7 @@ UserSchema.add({
     location: {
       name: String
     },
-    fbProfileUrl: String,
+    profileUrl: String,
     created_at  : {type : Date, default : Date.now}
 });
 
@@ -88,7 +90,61 @@ UserSchema.plugin(mongooseAuth, {
             return promise;
           }
       }
+    },
+    twitter: {
+      everyauth: {
+          myHostname: config.twitter.host_uri,
+          consumerKey: config.twitter.consumerKey,
+          consumerSecret: config.twitter.consumerSecret,
+          redirectPath: '/',
+          findOrCreateUser: function (sess, accessTok, accessTokenSecret, twitterUserMetadata) {
+            var promise = this.Promise(),
+                User = this.User()();
+            // TODO Check user in session or request helper first
+            //      e.g., req.user or sess.auth.userId
+            User.findOne({'twitter.id': twitterUser.id}, function (err, foundUser) {
+              if (err) return promise.fail(err);
+              if (foundUser) {
+                return promise.fulfill(foundUser);
+              }
+              console.log("CREATING");
+
+              var expiresDate = new Date;
+              expiresDate.setSeconds(expiresDate.getSeconds() + accessTokExtra);
+
+              user = new User({
+                  twitter: {
+                      id: twitterUser.id,
+                      accessToken: accessTok,
+                      expires: expiresDate,
+                      name: {
+                          full: twitterUser.name,
+                          first: twitterUser.first_name,
+                          last: twitterUser.last_name
+                      },
+                      alias: twitterUser.link.match(/^http:\/\/www.twitter\.com\/(.+)/)[1],
+                      gender: twitterUser.gender,
+                      email: twitterUser.email,
+                      timezone: twitterUser.timezone,
+                      locale: twitterUser.locale,
+                      updatedTime: twitterUser.updated_time
+                  },
+                  fbProfileUrl: twitterUser.link,
+                  bio: twitterUser.bio,
+                  location: {
+                    name: twitterUser.location && twitterUser.location.name ? twitterUser.location.name : ''
+                  }
+              });
+
+              user.save( function (err, savedUser) {
+                promise.fulfill(savedUser);
+              });
+            });
+
+            return promise;
+      }
     }
+  }
 });
 
 // validations
