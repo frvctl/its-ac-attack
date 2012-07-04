@@ -53,7 +53,7 @@ UserSchema.plugin(mongooseAuth, {
               if (foundUser) {
                 return promise.fulfill(foundUser);
               }
-              console.log("CREATING");
+              console.log("CREATING FB USER");
 
               var expiresDate = new Date;
               expiresDate.setSeconds(expiresDate.getSeconds() + accessTokExtra);
@@ -107,7 +107,7 @@ UserSchema.plugin(mongooseAuth, {
               if (foundUser) {
                 return promise.fulfill(foundUser);
               }
-              console.log("CREATING");
+              console.log("CREATING TWITTER USER");
 
               var expiresDate = new Date;
               expiresDate.setSeconds(expiresDate.getSeconds() + accessTokSecret);
