@@ -122,14 +122,14 @@ UserSchema.plugin(mongooseAuth, {
                           first: twitterUser.first_name,
                           last: twitterUser.last_name
                       },
-                      alias: twitterUser.url.match(/^http:\/\/www.twitter\.com\/(.+)/)[1],
+                      alias: twitterUser.screenName,
                       gender: twitterUser.gender,
                       email: twitterUser.email,
                       timezone: twitterUser.timezone,
                       locale: twitterUser.locale,
                       updatedTime: twitterUser.updated_time
                   },
-                  profileUrl: twitterUser.url,
+                  profileUrl: "http:\/\/twitter.com\/#!\/" + twitterUser.sceenName ,
                   bio: twitterUser.description,
                   location: {
                     name: twitterUser.location && twitterUser.location.name ? twitterUser.location.name : ''
