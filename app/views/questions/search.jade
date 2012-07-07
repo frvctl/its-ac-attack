@@ -1,7 +1,7 @@
-form(for="search").center.well.form-search
-  input(type='text', name="Query", placeholder="e.g. 'Dickens'").input-medium.search-query
-  button(type='submit').btn.btn-primary Search
- 
+form(name="searchForm", action="", method="get").search-form
+  input(type='text', name='searchInput', placeholder='E.G. Dickens') 
+  input(type='submit').btn.btn-primary 
+
 form.form-search
   each item in questions
       ul
