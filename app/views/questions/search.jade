@@ -11,11 +11,26 @@ div
 
 div(id="searchResultsDiv", style="display:all;")
   div.row-fluid
-    form.well
-      each item in questions
-        ul
-          li= item.difficulty
-          li= item.year
-          li= item.category
-          li= item.question
-          li= item.answer
+    each item in questions
+      ul
+        form.well
+          li(type="none")
+            != 'Difficulty: '
+            != item.difficulty
+            != ' | '
+            != 'Year: '
+            != item.year
+            != ' | '
+            != 'Category: '
+            != item.category
+            != ' | '
+            != 'Tournament: '
+            != item.tournament
+          hr
+          li(type="none")
+            != 'Question: '
+            != item.question
+          hr
+          li(type="none")
+            != 'Answer: '
+            != item.answer
