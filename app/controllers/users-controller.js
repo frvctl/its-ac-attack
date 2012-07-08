@@ -18,7 +18,7 @@ module.exports = function (app) {
 
   app.param('profileId', function (req, res, next, id) {
     User
-      .findOne({ _id : id })
+      .find({ _id : id })
       .run(function (err, user) {
         if (err) return next(err)
         if (!user) return next(new Error('Failed to load User ' + id))
@@ -41,21 +41,4 @@ module.exports = function (app) {
         user : user
     });
   });
-
-  // Access controll middleware
-  function loadUser(req, res, next){
-    if(req.session.user_id){
-      User.findById(req.session.user_id, function(user){
-        if(user){
-          req.currentUser = user;
-          next();
-        }else{
-          res.redirect('/sessions/new');
-        }
-      });
-    }else{
-      res.redirect('/sessions/new');
-    }
-  }
-
 };
