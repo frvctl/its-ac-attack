@@ -1,8 +1,3 @@
-script
-  function showDiv(){
-    document.getElementById('searchResultsDiv').style = "display:all";
-  }
-
 div
   form(name="searchForm", action="", method="get").center.well.search-form
     div
@@ -14,9 +9,9 @@ div(id="searchResultsDiv", style="display:all;")
     p
       if(questions.length == 0)
         != 'Use the search bar to search for Trivia Questions'
-      else if(questions.length > 10)
-        != 'Displaying 10 of '
-        != questions.length
+      else if(questions.length > maxNum)
+        != 'Displaying ' + currentFirst + ' through ' + maxNum 
+        != ' of ' + questions.length
       else
         != 'Displaying ' + questions.length + ' of ' + questions.length
     each item, i in questions
@@ -26,13 +21,13 @@ div(id="searchResultsDiv", style="display:all;")
             li(type="none")
               != i + ' ' + 'Difficulty: ' + item.difficulty +  ' | '
               != 'Year: ' + item.year + ' | ' + 'Category: '
-              != item.category + ' | ' + 'Tournament: '
-              != item.tournament
+              != item.category + ' | ' + 'Tournament: ' + item.tournament
             hr
             li(type="none")
-              != 'Question: '
-              != item.question
+              != 'Question: ' + item.question
             hr
             li(type="none")
-              != 'Answer: '
-              != item.answer
+              != 'Answer: ' + item.answer
+
+
+button(onclick='nextPage()').right.btn.btn-primary Next Page

@@ -24,6 +24,22 @@ textarea{
     margin-bottom: 10px;
 }
 
+.right{
+    text-align: right;
+}
+
+.left{
+    text-align: left;
+}
+
+.hidden{
+    visibility: hidden;
+}
+
+.visible{
+    visibility: visible;
+}
+
 /* typeography */
 
 h1, h2, h3, h4, h5, h6 {
