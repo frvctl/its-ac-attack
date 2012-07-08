@@ -1,4 +1,4 @@
-# A Trivia Database using Node.js, Express, and AngularJS
+# A Trivia Database using Node.js, Express, and SocketIO
 
 
 ## General Overview of the Project
