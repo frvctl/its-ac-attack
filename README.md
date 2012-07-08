@@ -36,11 +36,12 @@ intend to implement are as follows:
     <ul>
       <li> Through Social Media </li>
         <ul>
-          <li> Twitter </li>
+          <li><del> Twitter </del></li>
           <li> Google </li>
           <li><del> Facebook </del></li>
         </ul>
       <li> Standard Login </li>
+      <li> Session Handling and Controll </li>
     </ul>
     <li><del>Get all of the views and routes working properly </del></li> 
     <li><del>Get the JSON of questions from Kevin and work on the search function</del></li>
@@ -48,10 +49,21 @@ intend to implement are as follows:
     <li><del>Figure out what I am going to use for a server and how to go about setting that up and using it</del></li>
     <li>Core Features</li>
       <ul>
-          <li> Implement the Search Function </li>
-          <li>Create an ability to read out questions </li>
-          <li> Be able to select difficulty and/or where the question comes from </li>
-          <li> After that establish the ability for multiple people to see the same question and answer it --multiplayer mode-- </li>
+          <li><del> Implement the Search Functionality </del></li>
+            <ul>
+              <li> Make the multiple pages work </li>
+              <li> Add a lot better styling </li>
+            </ul>
+          <li> Implement the Practice Functionality </li>
+            <ul>
+              <li> "Read" out the questions </li>
+              <li> Check the Answer </li>
+              <li> Pick where the questions are coming from </li>
+            </ul>
+          <li> Implement multiplayer Mode </li>
+            <ul>
+              <li> Login is dependant on this being successfull </li>
+              <li> Buzzer with timer, after buzz person is locked out </li>
           <li> Implement the chat </li>
       </ul>
 </ul>
