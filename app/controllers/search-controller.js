@@ -5,19 +5,25 @@ module.exports = function(app){
     searchIndx = req.query.searchInput;
     if(searchIndx){
     Question.find({$or :                  // $or is similar to logical || also RegEx allows for partial searchs
-      [ {category: {$regex: searchIndx}}  // Searches by Categories
-      , {answer:{$regex: searchIndx}}     // Searches by Answers
-      , {difficulty:{$regex: searchIndx}} // Searches by Difficulty
-      ] }, function(err, questions){      // Searches by Year
+      [ {category: {$regex: searchIndx}}  // Searches by categories
+      , {answer:{$regex: searchIndx}}     // Searches by answers
+      , {difficulty:{$regex: searchIndx}} // Searches by difficulty
+      , {question: {$regex: searchIndx}}  // Searches the question
+      , {year: {$type: 18}}               // Searches by year
+      ] }, function(err, questions){      
     res.render('questions/search', {
       title: 'Search',
-      questions: questions
+      questions: questions,
+      maxNum: 20,
+      minNum: 0
       });
     });
     }else{
       res.render('questions/search', {
         title: 'Search',
-        questions: []
+        questions: [],
+        maxNum: 20,
+        minNum: 0
       });
     }
   });

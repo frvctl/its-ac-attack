@@ -6,31 +6,33 @@ script
 div
   form(name="searchForm", action="", method="get").center.well.search-form
     div
-      input(type='text', name='searchInput', placeholder='ex. Dickens').input-xlarge.search-query
+      input(type='text', name='searchInput', placeholder='Search').input-xlarge.search-query
     button(type='submit', onclick="showDiv()").btn.btn-primary Search
 
 div(id="searchResultsDiv", style="display:all;")
   div.row-fluid
-    each item in questions
-      ul
-        form.well
-          li(type="none")
-            != 'Difficulty: '
-            != item.difficulty
-            != ' | '
-            != 'Year: '
-            != item.year
-            != ' | '
-            != 'Category: '
-            != item.category
-            != ' | '
-            != 'Tournament: '
-            != item.tournament
-          hr
-          li(type="none")
-            != 'Question: '
-            != item.question
-          hr
-          li(type="none")
-            != 'Answer: '
-            != item.answer
+    p
+      if(questions.length == 0)
+        != 'Use the search bar to search for Trivia Questions'
+      else if(questions.length > 10)
+        != 'Displaying 10 of '
+        != questions.length
+      else
+        != 'Displaying ' + questions.length + ' of ' + questions.length
+    each item, i in questions
+      if(i < maxNum+1 && i > minNum)
+        ul
+          form.well
+            li(type="none")
+              != i + ' ' + 'Difficulty: ' + item.difficulty +  ' | '
+              != 'Year: ' + item.year + ' | ' + 'Category: '
+              != item.category + ' | ' + 'Tournament: '
+              != item.tournament
+            hr
+            li(type="none")
+              != 'Question: '
+              != item.question
+            hr
+            li(type="none")
+              != 'Answer: '
+              != item.answer
