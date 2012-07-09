@@ -4,7 +4,7 @@ div
       input(type='text', name='searchInput', placeholder='Search').input-xlarge.search-query
     button(type='submit', onclick="showDiv()").btn.btn-primary Search
 
-div(id="searchResultsDiv", style="display:all;")
+div(id="searchResultsDiv")
   div.row-fluid
     p
       if(questions.length == 0)
@@ -29,5 +29,4 @@ div(id="searchResultsDiv", style="display:all;")
             li(type="none")
               != 'Answer: ' + item.answer
 
-
-button(onclick='nextPage()').right.btn.btn-primary Next Page
+a(href='/search/' + counter, onclick=counter++).right.btn.btn-primary Next Page
