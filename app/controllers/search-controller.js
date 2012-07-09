@@ -18,27 +18,20 @@ module.exports = function(app){
             {difficulty:{$regex: searchIndx}}, // Searches by difficulty
             {question: {$regex: searchIndx}},  // Searches the question
             {year: {$type: 18}}                // Searches by year
-          ] }, [], {skip: pgNum*10, limit:11}, (function(err, questions){
+          ] }, [], {skip: pgNum*10, limit:nPerPage},
+          (function(err, questions){
                 res.render('questions/search', {
                   title: 'Search',
                   questions: questions,
-                  counter: counter,
-                  searchIndx: searchIndx,
-                  currentFirst: pgNum*10,
-                  maxNum: pgNum*15,
-                  minNum: (pgNum*10)-1
+                  searchIndx: searchIndx
             });
           })
-        )
-  }else{
+        );
+    }else{
       res.render('questions/search', {
         title: 'Search',
         questions: [],
-        counter: counter,
-        searchIndx:searchIndx,
-        currentFirst: pgNum*10,
-        maxNum: pgNum*15,
-        minNum: (pgNum*10)-1
+        searchIndx:searchIndx
       });
     }
   });

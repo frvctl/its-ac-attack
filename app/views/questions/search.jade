@@ -25,4 +25,13 @@ div(id="searchResultsDiv")
             li(type="none")
               != 'Answer: ' + item.answer
 
-a(href='/search/' + (counter+1) + '?searchInput=' + searchIndx).right.btn.btn-primary Next Page
+- var counter = 2;
+
+div
+  if(counter)
+    div.right
+      a(href='/search/' + (counter+1) + '?searchInput=' + searchIndx).right.btn.btn-primary Next Page
+
+  if(counter > 0)
+    div.left
+      a(href='/search/' + (counter-1) + '?searchInput=' + searchIndx).left.btn.btn-primary Previous Page
