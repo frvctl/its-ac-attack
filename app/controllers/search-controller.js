@@ -17,26 +17,25 @@ module.exports = function(app){
             {difficulty:{$regex: searchIndx}}, // Searches by difficulty
             {question: {$regex: searchIndx}},  // Searches the question
             {year: {$type: 18}}                // Searches by year
-          ] }).skip((pgNum-1)*nPerPage)
-              .limit(nPerPage)
-              .exec(function(err, questions){
+          ] }, [], {skip: 10, limit:5}, (function(err, questions){
                 res.render('questions/search', {
                   title: 'Search',
                   questions: questions,
+                  counter: 0,
                   currentFirst: pgNum*10,
                   maxNum: pgNum*15,
                   minNum: (pgNum*10)-1
             });
-        });
+          })
   }else{
       res.render('questions/search', {
         title: 'Search',
         questions: [],
         counter: 0,
         searchIndx:searchIndx,
-        currentFirst: currentFirst,
-        maxNum: maxNum,
-        minNum: minNum
+        currentFirst: pgNum*10,
+        maxNum: pgNum*15,
+        minNum: (pgNum*10)-1
       });
     }
   });
