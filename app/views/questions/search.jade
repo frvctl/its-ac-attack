@@ -6,16 +6,16 @@ div
 
 div(id="searchResultsDiv")
   div.row-fluid
-    p
-      if(questions.length == 0)
-        != 'Use the search bar to search for Trivia Questions'
-      else if(questions.length > maxNum)
-        != 'Displaying ' + currentFirst + ' through ' + maxNum 
-        != ' of ' + questions.length
-      else
-        != 'Displaying ' + questions.length + ' of ' + questions.length
+    //- p
+    //-   if(questions.length == 0)
+    //-     != 'Use the search bar to search for Trivia Questions'
+    //-   else if(questions.length > maxNum)
+    //-     != 'Displaying ' + currentFirst + ' through ' + maxNum 
+    //-     != ' of ' + questions.length
+    //-   else
+    //-     != 'Displaying ' + questions.length + ' of ' + questions.length
+    //-      if(i < maxNum+1 && i > minNum)
     each item, i in questions
-      if(i < maxNum+1 && i > minNum)
         ul
           form.well
             li(type="none")
@@ -29,4 +29,4 @@ div(id="searchResultsDiv")
             li(type="none")
               != 'Answer: ' + item.answer
 
-a(href='/search/' + counter, onclick=counter++).right.btn.btn-primary Next Page
+a(href='/search/' + (counter+1)).right.btn.btn-primary Next Page
