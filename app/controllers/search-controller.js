@@ -22,6 +22,7 @@ module.exports = function(app){
           (function(err, questions){
                 res.render('questions/search', {
                   title: 'Search',
+                  counter: 0,
                   questions: questions,
                   searchIndx: searchIndx
             });
@@ -31,6 +32,7 @@ module.exports = function(app){
       res.render('questions/search', {
         title: 'Search',
         questions: [],
+        counter: 0,
         searchIndx:searchIndx
       });
     }

@@ -37,7 +37,6 @@ intend to implement are as follows:
       <li> Through Social Media </li>
         <ul>
           <li><del> Twitter </del></li>
-          <li> Google </li>
           <li><del> Facebook </del></li>
         </ul>
       <li> Standard Login </li>
