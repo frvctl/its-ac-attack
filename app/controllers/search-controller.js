@@ -1,4 +1,5 @@
-var Question = mongoose.model('Question');
+var Question = mongoose.model('Question'),
+    counter = 0;
 
 module.exports = function(app){
   app.param('searchNext', function(req, res, next){
@@ -17,21 +18,23 @@ module.exports = function(app){
             {difficulty:{$regex: searchIndx}}, // Searches by difficulty
             {question: {$regex: searchIndx}},  // Searches the question
             {year: {$type: 18}}                // Searches by year
-          ] }, [], {skip: 10, limit:5}, (function(err, questions){
+          ] }, [], {skip: pgNum*10, limit:11}, (function(err, questions){
                 res.render('questions/search', {
                   title: 'Search',
                   questions: questions,
-                  counter: 0,
+                  counter: counter,
+                  searchIndx: searchIndx,
                   currentFirst: pgNum*10,
                   maxNum: pgNum*15,
                   minNum: (pgNum*10)-1
             });
           })
+        )
   }else{
       res.render('questions/search', {
         title: 'Search',
         questions: [],
-        counter: 0,
+        counter: counter,
         searchIndx:searchIndx,
         currentFirst: pgNum*10,
         maxNum: pgNum*15,
