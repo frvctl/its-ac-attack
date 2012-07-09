@@ -15,3 +15,11 @@
   * Implemented logos for facebook and twitter login
   * Configured twitter and facebook login properly
   * Improved overal UI and improved routing
+
+0.0.3
+========================
+  * Logged at 9:51PM July 8, 2012
+  * Compleltly added, reworked, and tweaked the search function
+  * Smoothed out and added style to the UI
+  * Added a drop down menu for things dealing with the use
+  * Started work on the practice function
