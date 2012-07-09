@@ -19,7 +19,7 @@ module.exports = function(app){
             {year: {$type: 18}}                // Searches by year
           ] }).skip((pgNum-1)*nPerPage)
               .limit(nPerPage)
-              .run(function(err, questions){
+              .exec(function(err, questions){
                 res.render('questions/search', {
                   title: 'Search',
                   questions: questions,
