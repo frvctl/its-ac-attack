@@ -1,5 +1,4 @@
-var Question = mongoose.model('Question'),
-    counter = 0;
+var Question = mongoose.model('Question');
 
 module.exports = function(app){
   app.param('searchNext', function(req, res, next){
@@ -9,7 +8,7 @@ module.exports = function(app){
   app.get('/search/:searchNext', function(req, res){
     var searchIndx = req.query.searchInput;
     var pg = req.params;
-    var pgNum = pg.searchNext;
+    var pgNum = parseInt(pg.searchNext, 10);
     var nPerPage = 10;
     if(searchIndx){
       Question.find({$or :                     // $or is similar to logical || also RegEx allows for partial searchs
@@ -22,7 +21,7 @@ module.exports = function(app){
           (function(err, questions){
                 res.render('questions/search', {
                   title: 'Search',
-                  counter: 0,
+                  counter: pgNum,
                   questions: questions,
                   searchIndx: searchIndx
             });
@@ -32,7 +31,7 @@ module.exports = function(app){
       res.render('questions/search', {
         title: 'Search',
         questions: [],
-        counter: 0,
+        counter: pgNum,
         searchIndx:searchIndx
       });
     }
