@@ -21,13 +21,13 @@ div(id="searchResultsDiv")
               a(href='/search/0?searchInput=' + item.difficulty)= item.difficulty  
               != ' | '
               != 'Year: '
-              a(href='search/0?searchInput=' + item.year)= item.year 
+              a(href='/search/0?searchInput=' + item.year)= item.year 
               != ' | ' 
               != 'Category: '
-              a(href='search/0?searchInput=' + item.category)= item.category 
+              a(href='/search/0?searchInput=' + item.category)= item.category 
               != ' | ' 
               != 'Tournament: '
-              a(href='search/0?searchInput=' + item.tournament)= item.tournament
+              a(href='/search/0?searchInput=' + item.tournament)= item.tournament
             hr
             li(type="none")
               != 'Question: ' + item.question
