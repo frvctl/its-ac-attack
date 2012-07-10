@@ -15,7 +15,6 @@ module.exports = function(app){
           [ {category: {$regex: searchIndx}},  // Searches by categories
             {answer:{$regex: searchIndx}},     // Searches by answers
             {difficulty:{$regex: searchIndx}}, // Searches by difficulty
-            {question: {$regex: searchIndx}},  // Searches the question
             {year: {$type: 18}}                // Searches by year
           ] }, [], {skip: pgNum*10, limit:nPerPage},
           (function(err, questions){
