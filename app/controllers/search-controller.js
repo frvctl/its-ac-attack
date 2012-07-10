@@ -15,12 +15,18 @@ module.exports = function(app){
           [ {category: {$regex: searchIndx}},  // Searches by categories
             {answer:{$regex: searchIndx}},     // Searches by answers
             {difficulty:{$regex: searchIndx}}, // Searches by difficulty
+            {tournament:{$regex: searchIndx}}, // Searches by tournament
             {year: {$type: 18}}                // Searches by year
-          ] }, [], {skip: pgNum*10, limit:nPerPage},
+          ] }, {category:1,answer:1,           // Fields which are specified to return info
+                difficulty:1,question:1,       // all other fields are now undefind
+                year:1, tournament:1},
+               {skip: pgNum*10, limit:nPerPage},
           (function(err, questions){
                 res.render('questions/search', {
                   title: 'Search',
                   counter: pgNum,
+                  lesserIndx: (pgNum*10),
+                  greaterIndx: (pgNum*10)+10,
                   questions: questions,
                   searchIndx: searchIndx
             });
@@ -31,6 +37,8 @@ module.exports = function(app){
         title: 'Search',
         questions: [],
         counter: pgNum,
+        lesserIndx: (pgNum*10),
+        greaterIndx: (pgNum*10)+10,
         searchIndx:searchIndx
       });
     }

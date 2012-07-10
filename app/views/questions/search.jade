@@ -9,15 +9,25 @@ div(id="searchResultsDiv")
      p
        if(questions.length == 0)
          != 'Use the search bar to search for Trivia Questions'
+       else if(questions.length < 10)
+         != 'Displaying ' + questions.length + ' of ' + questions.length
        else 
-         != 'Displaying ' + 10 + ' of ' + questions.length
+         != 'Displaying results ' + lesserIndx + ' through ' + greaterIndx
     each item, i in questions
         ul
           form.well
             li(type="none")
-              != i + ' ' + 'Difficulty: ' + item.difficulty +  ' | '
-              != 'Year: ' + item.year + ' | ' + 'Category: '
-              != item.category + ' | ' + 'Tournament: ' + item.tournament
+              != 'Difficulty: '
+              a(href='/search/0?searchInput=' + item.difficulty)= item.difficulty  
+              != ' | '
+              != 'Year: '
+              a(href='search/0?searchInput=' + item.year)= item.year 
+              != ' | ' 
+              != 'Category: '
+              a(href='search/0?searchInput=' + item.category)= item.category 
+              != ' | ' 
+              != 'Tournament: '
+              a(href='search/0?searchInput=' + item.tournament)= item.tournament
             hr
             li(type="none")
               != 'Question: ' + item.question
@@ -25,5 +35,11 @@ div(id="searchResultsDiv")
             li(type="none")
               != 'Answer: ' + item.answer
 
+if(questions.length > 8)
+  div.right
+    a(href='/search/' + (counter+1) + '?searchInput=' + searchIndx).btn.btn-primary Next Page
 
-a(href='/search/' + (counter+1) + '?searchInput=' + searchIndx).right.btn.btn-primary Next Page
+if(counter > 0)
+  div.left
+    a(href='/search/' + (counter+1) + '?searchInput=' + searchIndx).btn.btn-primary Next Page
+
