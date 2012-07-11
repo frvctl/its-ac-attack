@@ -1,29 +1,31 @@
 div(id="answerDiv", style="display:all;")
   div.row-fluid
     each item, i in questions
-      if(i < 1)
-        ul
-          form.well
-            li(type="none")
-              != 'Difficulty: '
-              != item.difficulty
-              != ' | '
-              != 'Year: '
-              != item.year
-              != ' | '
-              != 'Category: '
-              != item.category
-              != ' | '
-              != 'Tournament: '
-              != item.tournament
-            hr
-            li(type="none")
-              != 'Question: '
-              != item.question
-            hr
-            li(type="none")
-              != 'Answer: '
-              != item.answer
+      ul
+        form.well
+          li(type="none")
+            != 'Difficulty: '
+            != item.difficulty
+            != ' | '
+            != 'Year: '
+            != item.year
+            != ' | '
+            != 'Category: '
+            != item.category
+            != ' | '
+            != 'Tournament: '
+            != item.tournament
+          hr
+          li(type="none")
+            != 'Question: '
+            != item.question
+          hr
+          li(type="none")
+            != 'Answer: '
+            != item.answer
+
+if(isTrue)
+  p ITS TRUE WOOO
 
 div
   form(name="answerForm", action="", method="get").center.well.search-form
