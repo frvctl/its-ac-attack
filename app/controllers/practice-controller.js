@@ -7,7 +7,6 @@ module.exports = function(app){
   app.get('/practice', function(req, res){
     searchIndx = 'History';
     userAnswer = req.query.answerInput;
-    console.log(userAnswer);
     if(searchIndx){
       Question.find({$or :                     // $or is similar to logical || also RegEx allows for partial searchs
           [ {category: {$regex: searchIndx}},  // Searches by categories
@@ -20,6 +19,7 @@ module.exports = function(app){
                 year:1, tournament:1},
                {skip: 1, limit:1},
           (function(err, questions){
+            var questionSplit = questions[0].question.split(" ");
             var regexMatch = questions[0].answer.match(/(.*?)( \[(.*)\])?$/);
             var theAns = regexMatch[1];             // First index is everything outside of brackets
             var insideBrackets = regexMatch[3];     // Third is everything inside brackets
@@ -35,6 +35,7 @@ module.exports = function(app){
       res.render('questions/practice', {
         title: 'Practice',
         questions: questions,
+        wordsToRead: questionSplit,
         isTrue: ansIsTrue
         });
       })
@@ -43,6 +44,7 @@ module.exports = function(app){
       res.render('questions/practice', {
         title: 'Practice',
         questions: [],
+        wordsToRead: questionSplit,
         isTrue: ansIsTrue
       });
     }

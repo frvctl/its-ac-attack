@@ -50,7 +50,7 @@ intend to implement are as follows:
       <ul>
           <li><del> Implement the Search Functionality </del></li>
             <ul>
-              <li> Make the multiple pages work </li>
+              <li><del> Make the multiple pages work </del></li>
               <li> Add a lot better styling </li>
             </ul>
           <li> Implement the Practice Functionality </li>
