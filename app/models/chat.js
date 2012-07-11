@@ -5,7 +5,8 @@ var mongoose = require('mongoose');
 var Chat = new Schema({
     _id : mongoose.Schema.ObjectId,
     socket_id: String,
-    nickname : String
+    nickname : String,
+    message: String
 });
 
 mongoose.model('Chat', Chat);

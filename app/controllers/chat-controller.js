@@ -1,26 +1,6 @@
 // var Chat = mongoose.model('Chat');
 
 module.exports = function(app){
-//   var io = require('socket.io').listen(app);
-
-//   io.sockets.on('connection', function(socket){
-
-//     socket.on('login attempt', function(data){
-//       session.login(io, socket, data);
-//     });
-
-//     socket.on('logout attempt', function(data){
-//       session.logout(io, socket, data);
-//     });
-
-//     socket.on('message', function(data){
-//       message.message(io, socket, data);
-//     });
-
-//     socket.on('disconnect', function(data){
-//       session.disconnect(io, socket, data);
-//     });
-//   });
 
 //   app.get('/chat', function(req, res, io, socket, data){
 //     User.findOne({socket_id: socket.id

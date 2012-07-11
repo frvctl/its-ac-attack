@@ -51,7 +51,7 @@ function bootApplication(app) {
     // cookieParser should be above session
     app.use(express.cookieParser());
     app.use(express.session({
-      secret: "**ITSACATTACKSECRET**",
+      secret: "secret",
       store: new mongoStore({
         url: config.db.uri,
         collection : 'sessions'
@@ -96,11 +96,11 @@ function bootApplication(app) {
     },
 
     appName : function(req, res) {
-      return 'nodejs express mongoose demo';
+      return 'an app';
     },
 
     slogan : function(req,res) {
-      return 'nodejs express mongoose demo';
+      return 'an app';
     }
 
   });
