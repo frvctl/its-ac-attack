@@ -104,9 +104,9 @@ UserSchema.plugin(mongooseAuth, {
                //      e.g., req.user or sess.auth.userId
             User.findOne({'twitter.id': twitterUser.id}, function (err, foundUser) {
               if (err) return promise.fail(err);
-            //  if (foundUser) {
-            //    return promise.fulfill(foundUser);  //TODO ADD UPDATING via sessions
-            //  }
+              if (foundUser) {
+                return promise.fulfill(foundUser);
+              }
               console.log("CREATING TWITTER USER");
 
               var expiresDate = new Date;
