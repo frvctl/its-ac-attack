@@ -1,0 +1,34 @@
+div(id="answerDiv", style="display:all;")
+  div.row-fluid
+    each item, i in questions
+      ul
+        form.well
+          li(type="none")
+            != 'Difficulty: '
+            != item.difficulty
+            != ' | '
+            != 'Year: '
+            != item.year
+            != ' | '
+            != 'Category: '
+            != item.category
+            != ' | '
+            != 'Tournament: '
+            != item.tournament
+          hr
+          li(type="none")
+            != 'Question: '
+            != item.question
+          hr
+          li(type="none")
+            != 'Answer: '
+            != item.answer
+
+if(isTrue)
+  p ITS TRUE WOOO
+
+div
+  form(name="answerForm", action="", method="get").center.well.search-form
+    div
+      input(type='text', name='answerInput', placeholder='Answer').input-xlarge.search-query
+    button(type='submit').btn.btn-primary Answer

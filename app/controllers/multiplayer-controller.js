@@ -1,10 +1,16 @@
 var Question = mongoose.model('Question');
 
 module.exports = function(app){
+  var io = require('socket.io').listen(app);
+
+  io.sockets.on('connection', function(socket){
+    console.log('Connect is happenin');
+  });
+
   var ansIsTrue = false,
       promptIsTrue = false,
       afterPromp = false;
-  app.get('/practice', function(req, res){
+  app.get('/multiplayer', function(req, res){
     searchIndx = 'History';
     userAnswer = req.query.answerInput;
     if(searchIndx){
@@ -20,8 +26,7 @@ module.exports = function(app){
                {skip: 1, limit:1},
           (function(err, questions){
             var questionSplit = questions[0].question.split(" ");
-            var regexMatch = questions[0].answer
-                              .match(/(.*?)( \[(.*)\])?$/);
+            var regexMatch = questions[0].answer.match(/(.*?)( \[(.*)\])?$/);
             var theAns = regexMatch[1];             // First index is everything outside of brackets
             var insideBrackets = regexMatch[3];     // Third is everything inside brackets
             if(regexMatch === null) throw "shitstorm";
@@ -33,8 +38,8 @@ module.exports = function(app){
                 ansIsTrue = false;
               }
             }
-      res.render('questions/practice', {
-        title: 'Practice',
+      res.render('multiplayer/multiplayer-practice', {
+        title: 'Multiplayer',
         questions: questions,
         wordsToRead: questionSplit,
         isTrue: ansIsTrue
@@ -42,8 +47,8 @@ module.exports = function(app){
       })
     );
     }else{
-      res.render('questions/practice', {
-        title: 'Practice',
+      res.render('multiplayer/multiplayer-practice', {
+        title: 'Multiplayer',
         questions: [],
         wordsToRead: questionSplit,
         isTrue: ansIsTrue
