@@ -74,7 +74,16 @@ module.exports = function(app){
   app.get('/multiplayer', function(req, res){
     searchIndx = 'History';
     userAnswer = req.query.answerInput;
-    loggedInUsers = req.session.auth.twitter.user.name;
+    var loggedInUsers = [];
+    if(req.session.auth.twitter.user.name){
+      loggedInUsers.push(req.session.auth.twitter.user.name);
+    }else if(req.session.auth.twitter.user.name 
+                && req.session.auth.facebook.user.name){
+      loggedInUsers.push(req.session.auth.twitter.user.name);
+      loggedInUsers.push(req.session.auth.facebook.user.name);
+    }else{
+      console.log('wtf');
+    }
     console.log(loggedInUsers);
     if(searchIndx){
       Question.find({$or :                     // $or is similar to logical || also RegEx allows for partial searchs
