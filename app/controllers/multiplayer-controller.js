@@ -78,9 +78,15 @@ module.exports = function(app){
 
   searchIndx = 'History';
   userAnswer = req.query.answerInput;
-  loggedInUsers = req.sessionStore.length(function(err, len){
-    console.log(len);
-  });
+  if(req.loggedIn){
+    loggedInUsers = req.session.auth.twitter.user.name;
+  }else if(req.loggedIn){
+    loggedInUsers = req.session.auth.facebook.user.name;
+  }else{
+    loggedInUsers = 'None';
+  }
+  loggedIn = req.session.auth;
+  console.log(loggedIn);
   console.log(loggedInUsers);
   if(searchIndx){
     Question.find({$or :                   // $or is similar to logical || also RegEx allows for partial searchs
@@ -113,6 +119,7 @@ module.exports = function(app){
       questions: questions,
       wordsToRead: questionSplit,
       buzzTrue: false,
+      loggedIn: loggedIn,
       loggedInUsers: loggedInUsers,
       isTrue: ansIsTrue
       });
@@ -124,6 +131,7 @@ module.exports = function(app){
       questions: [],
       wordsToRead: questionSplit,
       buzzTrue: false,
+      loggedIn: loggedIn,
       loggedInUsers: loggedInUsers,
       isTrue: ansIsTrue
     });
