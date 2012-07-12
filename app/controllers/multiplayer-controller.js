@@ -2,9 +2,11 @@ var Question = mongoose.model('Question');
 
 module.exports = function(app){
   var io = require('socket.io').listen(app),
-      nicknames = {};
-
-  io.sockets.on('connection', function (socket) {
+      ansIsTrue = false,
+      promptIsTrue = false,
+      afterPromp = false;
+  app.get('/multiplayer', function(req, res){
+      io.sockets.on('connection', function (socket) {
 
     /* 
      * There is a lot to be done in this area of the app so 
@@ -20,6 +22,16 @@ module.exports = function(app){
      * TODO:
      * -- Get the users currently logged into the application and 
      *    displayer them
+     *       -- Use req.session.twitter/facebook.user.attribute
+     *       -- Not sure if there is a way to get all logged in
+     *          users and im also not sure it matters, because
+     *          using socket.io we can just transmit who is 
+     *          actually in the game. My idea as of now is that
+     *          a user would go to the multiplayer page, and if
+     *          not signed in would be forced to do so, after that
+     *          they could choose which game to join, once they join
+     *          the game their name will be displayed to everyone 
+     *          using socket.io
      * -- Determine if more than one controller is needed to handle 
      *    multiplayer. As in maybe a practice controller, a chat
      *    controller and a buzzer controller... something to con
@@ -42,21 +54,17 @@ module.exports = function(app){
      */
     socket.on('answer submitted', function(ans){
       // logic here
-    })
+    });
 
     socket.on('user message', function (msg) {
       socket.broadcast.emit('user message', socket.nickname, msg);
     });
 
-    socket.on('nickname', function (nick, fn) {
-      if (nicknames[nick]) {
-        fn(true);
-      } else {
-        fn(false);
-        nicknames[nick] = socket.nickname = nick;
-        socket.broadcast.emit('announcement', nick + ' connected');
-        io.sockets.emit('nicknames', nicknames);
-      }
+    socket.on('nickname', function (nick) {
+      nick = req.session.twitter.user.name;
+      nicknames[nick] = socket.nickname = nick;
+      socket.broadcast.emit('announcement', nick + ' connected');
+      io.sockets.emit('nicknames', nicknames);
     });
 
     socket.on('disconnect', function () {
@@ -68,71 +76,57 @@ module.exports = function(app){
     });
   });
 
-  var ansIsTrue = false,
-      promptIsTrue = false,
-      afterPromp = false;
-  app.get('/multiplayer', function(req, res){
-    searchIndx = 'History';
-    userAnswer = req.query.answerInput;
-    twitName = req.session.auth.twitter.user.name;
-   // fbName = req.session.auth.facebook.user.name;
-    console.log(twitName);
-    var loggedInUsers = [];
-    if(req.session.auth.twitter.user.name){
-      loggedInUsers.push(req.session.auth.twitter.user.name);
-    }else if(req.session.auth.twitter.user.name 
-                && req.session.auth.facebook.user.name){
-      loggedInUsers.push(req.session.auth.twitter.user.name);
-      loggedInUsers.push(req.session.auth.facebook.user.name);
-    }else{
-      console.log('wtf');
-    }
-    console.log(loggedInUsers);
-    if(searchIndx){
-      Question.find({$or :                     // $or is similar to logical || also RegEx allows for partial searchs
-          [ {category: {$regex: searchIndx}},  // Searches by categories
-            {answer:{$regex: searchIndx}},     // Searches by answers
-            {difficulty:{$regex: searchIndx}}, // Searches by difficulty
-            {tournament:{$regex: searchIndx}}, // Searches by tournament
-            {year: {$type: 18}}                // Searches by year
-          ] }, {category:1, answer:1,           // Fields which are specified to return info
-                difficulty:1, question:1,       // all other fields are now undefind
-                year:1, tournament:1},
-               {skip: 1, limit:1},
-          (function(err, questions){
-            var questionSplit = questions[0].question.split(" ");
-            var regexMatch = questions[0].answer
-                                .match(/(.*?)( \[(.*)\])?$/);
-            var theAns = regexMatch[1];             // First index is everything outside of brackets
-            var insideBrackets = regexMatch[3];     // Third is everything inside brackets
-            if(regexMatch === null) throw "shitstorm";
-            if(insideBrackets === null) throw "nothing in brackets";
-            if(userAnswer){
-              if(userAnswer.toLowerCase() === theAns.toLowerCase()){
-                ansIsTrue = true;
-              }else{
-                ansIsTrue = false;
-              }
-            }
-      res.render('multiplayer/multiplayer-practice', {
-        title: 'Multiplayer',
-        questions: questions,
-        wordsToRead: questionSplit,
-        buzzTrue: false,
-        loggedInUsers: loggedInUsers,
-        isTrue: ansIsTrue
-        });
-      })
-    );
-    }else{
-      res.render('multiplayer/multiplayer-practice', {
-        title: 'Multiplayer',
-        questions: [],
-        wordsToRead: questionSplit,
-        buzzTrue: false,
-        loggedInUsers: loggedInUsers,
-        isTrue: ansIsTrue
-      });
-    }
+  searchIndx = 'History';
+  userAnswer = req.query.answerInput;
+  loggedInUsers = req.sessionStore.length(function(err, len){
+    console.log(len);
   });
+  console.log(loggedInUsers);
+  if(searchIndx){
+    Question.find({$or :                   // $or is similar to logical || also RegEx allows for partial searchs
+      [ {category: {$regex: searchIndx}},  // Searches by categories
+        {answer:{$regex: searchIndx}},     // Searches by answers
+        {difficulty:{$regex: searchIndx}}, // Searches by difficulty
+        {tournament:{$regex: searchIndx}}, // Searches by tournament
+        {year: {$type: 18}}                // Searches by year
+      ] }, {category:1, answer:1,          // Fields which are specified to return info
+            difficulty:1, question:1,      // all other fields are now undefind
+            year:1, tournament:1},
+           {skip: 1, limit:1},
+      (function(err, questions){
+        var questionSplit = questions[0].question.split(" ");
+        var regexMatch = questions[0].answer
+                            .match(/(.*?)( \[(.*)\])?$/);
+        var theAns = regexMatch[1];             // First index is everything outside of brackets
+        var insideBrackets = regexMatch[3];     // Third is everything inside brackets
+        if(regexMatch === null) throw "shitstorm";
+        if(insideBrackets === null) throw "nothing in brackets";
+        if(userAnswer){
+          if(userAnswer.toLowerCase() === theAns.toLowerCase()){
+             ansIsTrue = true;
+          }else{
+             ansIsTrue = false;
+          }
+        }
+    res.render('multiplayer/multiplayer-practice', {
+      title: 'Multiplayer',
+      questions: questions,
+      wordsToRead: questionSplit,
+      buzzTrue: false,
+      loggedInUsers: loggedInUsers,
+      isTrue: ansIsTrue
+      });
+     })
+   );
+  }else{
+    res.render('multiplayer/multiplayer-practice', {
+      title: 'Multiplayer',
+      questions: [],
+      wordsToRead: questionSplit,
+      buzzTrue: false,
+      loggedInUsers: loggedInUsers,
+      isTrue: ansIsTrue
+    });
+   }
+ });
 };
