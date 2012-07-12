@@ -74,6 +74,9 @@ module.exports = function(app){
   app.get('/multiplayer', function(req, res){
     searchIndx = 'History';
     userAnswer = req.query.answerInput;
+    twitName = req.session.auth.twitter.user.name;
+   // fbName = req.session.auth.facebook.user.name;
+    console.log(twitName);
     var loggedInUsers = [];
     if(req.session.auth.twitter.user.name){
       loggedInUsers.push(req.session.auth.twitter.user.name);
