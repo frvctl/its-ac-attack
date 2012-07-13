@@ -3,8 +3,7 @@
 
 var express = require('express'),
     fs = require('fs'),
-    utils = require('./lib/utils'),
-    auth = require('./authorization');
+    utils = require('./lib/utils');
 
 
 // Load configurations

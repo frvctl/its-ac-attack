@@ -1,10 +1,11 @@
-var Question = mongoose.model('Question');
+var Question = mongoose.model('Question'),
+    mid = require('../../middleware.js');
 
 module.exports = function(app){
   var ansIsTrue = false,
       promptIsTrue = false,
       afterPromp = false;
-  app.get('/practice', function(req, res){
+  app.get('/practice', mid.assignUserName, function(req, res){
     searchIndx = 'History';
     userAnswer = req.query.answerInput;
     if(searchIndx){
@@ -37,7 +38,8 @@ module.exports = function(app){
         title: 'Practice',
         questions: questions,
         wordsToRead: questionSplit,
-        isTrue: ansIsTrue
+        isTrue: ansIsTrue,
+        userName: req.userName
         });
       })
     );
@@ -46,7 +48,8 @@ module.exports = function(app){
         title: 'Practice',
         questions: [],
         wordsToRead: questionSplit,
-        isTrue: ansIsTrue
+        isTrue: ansIsTrue,
+        userName: req.userName
       });
     }
   });

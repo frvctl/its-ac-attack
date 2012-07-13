@@ -1,21 +1,25 @@
+var mid = require('../../middleware.js');
 
 module.exports = function(app){
-
-  app.get('/home', function(req, res){
+  
+  app.get('/home', mid.assignUserName, function(req, res){
     res.render('static_pages/home', {
-      title: 'Home'
+      title: 'Home',
+      userName: req.userName
     });
   });
 
-  app.get('/contact', function(req, res){
+  app.get('/contact', mid.assignUserName, function(req, res){
     res.render('static_pages/contact', {
-      title: 'Contact'
+      title: 'Contact',
+      userName: req.userName
     });
   });
 
-  app.get('/help', function(req, res){
+  app.get('/help', mid.assignUserName, function(req, res){
     res.render('static_pages/help', {
-      title: 'Help'
+      title: 'Help',
+      userName: req.userName
     });
   });
 

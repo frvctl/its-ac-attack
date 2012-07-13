@@ -1,4 +1,5 @@
-// var Chat = mongoose.model('Chat');
+var Chat = mongoose.model('Chat'),
+    mid = require('../../middleware.js');
 
 module.exports = function(app){
   var io = require('socket.io').listen(app),
