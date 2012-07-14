@@ -2,12 +2,17 @@ var Question = mongoose.model('Question'),
     mid = require('../../middleware.js');
 
 module.exports = function(app){
-  var ansIsTrue = false,
-      promptIsTrue = false,
-      afterPromp = false;
-  app.get('/practice', mid.assignUserName, function(req, res){
-    searchIndx = 'History';
-    userAnswer = req.query.answerInput;
+
+  app.param('nextQuestion', function(req, res, next){
+    next();
+  });
+
+  app.get('/practice/:nextQuestion', mid.assignUserName, function(req, res){
+    var searchIndx = 'History';
+    var userAnswer = req.query.answerInput;
+    var ansIsTrue = false;
+    var ques = req.params;
+    var quesNum = parseInt(ques.nextQuestion, 10);
     if(searchIndx){
       Question.find({$or :                     // $or is similar to logical || also RegEx allows for partial searchs
           [ {category: {$regex: searchIndx}},  // Searches by categories
@@ -18,7 +23,7 @@ module.exports = function(app){
           ] }, {category:1,answer:1,           // Fields which are specified to return info
                 difficulty:1,question:1,       // all other fields are now undefind
                 year:1, tournament:1},
-               {skip: 1, limit:1},
+               {skip: quesNum, limit:1},
           (function(err, questions){
             var questionSplit = questions[0].question.split(" ");
             var regexMatch = questions[0].answer
@@ -30,12 +35,14 @@ module.exports = function(app){
             if(userAnswer){
               if(userAnswer.toLowerCase() === theAns.toLowerCase()){
                 ansIsTrue = true;
+                req.params = ques + 1;
               }else{
                 ansIsTrue = false;
               }
             }
       res.render('questions/practice', {
         title: 'Practice',
+        counter: quesNum,
         questions: questions,
         wordsToRead: questionSplit,
         isTrue: ansIsTrue,
@@ -46,6 +53,7 @@ module.exports = function(app){
     }else{
       res.render('questions/practice', {
         title: 'Practice',
+        counter: quesNum,
         questions: [],
         wordsToRead: questionSplit,
         isTrue: ansIsTrue,

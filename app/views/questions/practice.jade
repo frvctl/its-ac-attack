@@ -1,4 +1,16 @@
-div(id="answerDiv", style="display:all;")
+style
+  div.hide{visibility:hidden}
+
+script
+  $(document).ready(function(){
+    $("#buzzer").click(function(event){
+      $("#answerDiv").removeClass("hide");
+      $("#buzzer").addClass("hide");
+      });
+    });
+
+
+div
   div.row-fluid
     each item, i in questions
       ul
@@ -27,8 +39,10 @@ div(id="answerDiv", style="display:all;")
 if(isTrue)
   p ITS TRUE WOOO
 
-div
+div#answerDiv.hide
   form(name="answerForm", action="", method="get").center.well.search-form
     div
       input(type='text', name='answerInput', placeholder='Answer').input-xlarge.search-query
     button(type='submit').btn.btn-primary Answer
+
+button#buzzer.btn.btn-primary Buzzer!
