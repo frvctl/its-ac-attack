@@ -11,6 +11,9 @@ module.exports = function(app){
     var searchIndx = 'History';
     var userAnswer = req.query.answerInput;
     var ansIsTrue = false;
+    var ansIsFalse = false;
+    var i = 0;
+    var wordArray = [];
     var ques = req.params;
     var quesNum = parseInt(ques.nextQuestion, 10);
     if(searchIndx){
@@ -25,7 +28,20 @@ module.exports = function(app){
                 year:1, tournament:1},
                {skip: quesNum, limit:1},
           (function(err, questions){
-            var questionSplit = questions[0].question.split(" ");
+            var questionSplit = questions[0]
+                                  .question.split(" ");
+            
+            function blah(){
+              if(questionSplit[i] !== undefined){
+                wordArray = questionSplit.slice(0, i++);
+                setTimeout(function(){blah();}, 1000);
+              }
+            }
+
+            blah();
+
+            console.log(wordArray);
+
             var regexMatch = questions[0].answer
                               .match(/(.*?)( \[(.*)\])?$/);
             var theAns = regexMatch[1];             // First index is everything outside of brackets
@@ -35,8 +51,10 @@ module.exports = function(app){
             if(userAnswer){
               if(userAnswer.toLowerCase() === theAns.toLowerCase()){
                 ansIsTrue = true;
+                ansIsFalse = false;
                 req.params = ques + 1;
               }else{
+                ansIsFalse = true;
                 ansIsTrue = false;
               }
             }
@@ -44,8 +62,9 @@ module.exports = function(app){
         title: 'Practice',
         counter: quesNum,
         questions: questions,
-        wordsToRead: questionSplit,
+        wordsToRead: wordArray,
         isTrue: ansIsTrue,
+        isFalse: ansIsFalse,
         userName: req.userName
         });
       })
@@ -55,7 +74,7 @@ module.exports = function(app){
         title: 'Practice',
         counter: quesNum,
         questions: [],
-        wordsToRead: questionSplit,
+        wordsToRead: wordArray,
         isTrue: ansIsTrue,
         userName: req.userName
       });

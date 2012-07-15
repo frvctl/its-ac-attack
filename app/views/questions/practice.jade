@@ -8,8 +8,6 @@ script
       $("#buzzer").addClass("hide");
       });
     });
-
-
 div
   div.row-fluid
     each item, i in questions
@@ -31,13 +29,22 @@ div
           li(type="none")
             != 'Question: '
             != item.question
-          hr
-          li(type="none")
-            != 'Answer: '
-            != item.answer
+      
+      p= item.answer
 
-if(isTrue)
-  p ITS TRUE WOOO
+      if(isTrue && !isFalse)
+        p ITS TRUE WOOO
+        a(href='/practice/' + (counter+1) + '?answerInput=').btn.btn-primary Continue to the Next
+
+      if(!isTrue && isFalse)
+        p 
+          != 'ITS FALSE WOO THE CORRECT ANSWER IS ' 
+          != item.answer
+
+        a(href='/practice/' + (counter+1) + '?answerInput=').btn.btn-primary Continue to the Next Question?
+
+each word in wordsToRead
+  p= word
 
 div#answerDiv.hide
   form(name="answerForm", action="", method="get").center.well.search-form
@@ -45,4 +52,6 @@ div#answerDiv.hide
       input(type='text', name='answerInput', placeholder='Answer').input-xlarge.search-query
     button(type='submit').btn.btn-primary Answer
 
-button#buzzer.btn.btn-primary Buzzer!
+if(!isTrue && !isFalse)
+  div.center
+    button#buzzer.btn.btn-primary.btn-large Buzzer!

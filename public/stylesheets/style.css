@@ -126,3 +126,7 @@ input, textarea, select, .undeditable-input  {
     height: auto;
     margin-bottom:15px;
 }
+
+.hide{
+    visibility:hidden
+}
