@@ -40,6 +40,9 @@ textarea{
     visibility: visible;
 }
 
+.navbar .divider-vertical {margin: 0}
+.navbar .nav > li > a {padding: 10px 23px 11px 20px;}
+
 /* typeography */
 
 h1, h2, h3, h4, h5, h6 {

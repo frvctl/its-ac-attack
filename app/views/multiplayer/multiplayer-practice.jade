@@ -1,6 +1,7 @@
 script(src="/socket.io/socket.io.js")
 script
   var socket = io.connect();
+
   socket.on('question', function(data){
      var q = data[0];
      var words = q.question.split(" ");
@@ -17,47 +18,69 @@ script
      nextWord();
   });
 
+  socket.on('answerResult', function(data){
+    $(document).ready(function(){
+      console.log(data);
+      if(data == true){
+        $('#answer').text('Your answer is correct!');
+      }else{
+        $('#answer').text('Your answer is incorrect =(')
+      }
+    });
+  });
+
   $(document).ready(function(){
     $('#answerForm').submit(function(event){
       event.preventDefault();
       socket.emit('answer', $('#answerInput').val());
+      $('#answerDiv').addClass("hide");
+      $('#nextQuestionButton').removeClass("hide");
+    });
+  });
+
+  $(document).ready(function(){
+    $("#buzzer").click(function(event){
+      socket.emit('buzzed', userName)
+      $("#answerDiv").removeClass("hide");
+      $("#buzzer").addClass("hide");
     });
   });
 
 
-!= channel
-
 if(loggedIn)
-  div(id="answerDiv", style="display:all;")
-    div.row-fluid
-        ul
-          form.well
-            li(type="none")
-              != 'Difficulty: '
-              span#difficulty
-              != ' | '
-              != 'Year: '
-              span#year
-              != ' | '
-              != 'Category: '
-              span#category
-              != ' | '
-              != 'Tournament: '
-              span#tournament
-            hr    
-            span#question
-            hr
-            span#answer
+  div#messageBox
+    p.center
+      != 'Hello ' 
+      !=  userName
 
-  div
+  div.row-fluid
+    ul
+      form.well
+        li(type="none")
+          != 'Difficulty: '
+          span#difficulty
+          != ' | '
+          != 'Year: '
+          span#year
+          != ' | '
+          != 'Category: '
+          span#category
+          != ' | '
+          != 'Tournament: '
+          span#tournament
+          hr    
+          span#question
+      span#answer
+
+  div#answerDiv.hide
     form(name="answerForm", action="", method="get")#answerForm.center.well.search-form
       div
         input(type='text', autocomplete="off", name='answerInput', placeholder='Answer')#answerInput.input-xlarge.search-query
       button(type='submit')#answerButton.btn.btn-primary Answer
-
-  li
-    != 'Hello ' 
-    != loggedInUsers
+  
+  div#buttons.center
+    button#buzzer.btn.btn-primary.btn-large Buzzer!
+    button#nextQuestionButton.btn.btn-primary.hide Next Question!
 
 if(!loggedIn)
   p Log in you idiot

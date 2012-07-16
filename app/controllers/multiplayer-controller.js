@@ -63,8 +63,8 @@ module.exports = function(app){
      * informed, the timer can start for the answering user, and all other users
      * can be locked out
      */
-    socket.on('buzzer', function(data){
-      socket.emit('buzzerBuzzed', data);
+    socket.on('buzzed', function(data){
+      socket.emit('', data);
     });
 
     /*
@@ -98,29 +98,21 @@ module.exports = function(app){
    * ation.
    */
   app.get('/multiplayer/:nextQuestion', mid.assignUserName, function(req, res){
-    
     if(req.loggedIn){
-      if(req.session.auth.twitter){
-        loggedInUsers = req.session.auth.twitter.user.name;
-      }else{
-        loggedInUsers = req.session.auth.facebook.user.name;
-      }
-
-    loggedIn = req.session.auth;
-    
+      loggedIn = req.session.auth;
       res.render('multiplayer/multiplayer-practice', {
         title: 'Multiplayer',
         loggedIn: loggedIn,
-        loggedInUsers: loggedInUsers,
+        loggedInUser: loggedInUser,
         userName: req.userName,
         nextQuestion: req.params.nextQuestion
         });
     }else{
-      loggedInUsers = 'None';
+      loggedInUser = 'None';
       res.render('multiplayer/multiplayer-practice', {
         title: 'Multiplayer',
         loggedIn: loggedIn,
-        loggedInUsers: loggedInUsers,
+        loggedInUser: loggedInUser,
         userName: req.userName,
         nextQuestion: req.params.nextQuestion
       });
