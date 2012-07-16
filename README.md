@@ -55,13 +55,13 @@ intend to implement are as follows:
             </ul>
           <li> Implement the Practice Functionality </li>
             <ul>
-              <li> "Read" out the questions </li>
-              <li> Check the Answer </li>
+              <li><del> "Read" out the questions <del></li>
+              <li><del> Check the Answer <del></li>
               <li> Pick where the questions are coming from </li>
             </ul>
           <li> Implement multiplayer Mode </li>
             <ul>
-              <li> Login is dependant on this being successfull </li>
+              <li><del> Login is dependant on this being successfull <del></li>
               <li> Buzzer with timer, after buzz person is locked out </li>
           <li> Implement the chat </li>
       </ul>
