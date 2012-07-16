@@ -1,4 +1,5 @@
 var Question = mongoose.model('Question'),
+    Chat = mongoose.model('Chat'),
     mid = require('../../middleware.js');
 
 /*
@@ -44,11 +45,25 @@ function getNextQuestionAndCheckAnswer(theAnswer, callback){
 }
 
 module.exports = function(app){
-  var io = require('socket.io').listen(app);
+  var io = require('socket.io').listen(app),
+      nicknames = {};
 
   io.sockets.on('connection', function (socket) {
-    socket.emit('userNames', userName);
-    
+    socket.on('user message', function (msg) {
+       socket.broadcast.emit('user message', socket.nickname, msg);
+    });
+
+    socket.on('nickname', function (nick, fn) {
+       if (nicknames[nick]) {
+         fn(true);
+       } else {
+         fn(false);
+         nicknames[nick] = socket.nickname = nick;
+         socket.broadcast.emit('announcement', nick + ' connected');
+         io.sockets.emit('nicknames', nicknames);
+       }
+    });
+
     /*
      * On the initial connection get the question and send it back to the client
      * side for rendering
@@ -56,7 +71,6 @@ module.exports = function(app){
     getNextQuestionAndCheckAnswer(null, function(question){
       socket.emit('question',  question);
     });
-
 
     /*
      * Listens for when a user hits the buzzer, at which point we send who hit
@@ -78,8 +92,13 @@ module.exports = function(app){
       });
     });
 
+
     socket.on('disconnect', function () {
-      //logic here
+       if (!socket.nickname) return;
+
+       delete nicknames[socket.nickname];
+       socket.broadcast.emit('announcement', socket.nickname + ' disconnected');
+       socket.broadcast.emit('nicknames', nicknames);
     });
 
   });
@@ -100,20 +119,25 @@ module.exports = function(app){
    */
   app.get('/multiplayer/:nextQuestion', mid.assignUserName, function(req, res){
     if(req.loggedIn){
-      loggedIn = req.session.auth;
       res.render('multiplayer/multiplayer-practice', {
         title: 'Multiplayer',
-        loggedIn: loggedIn,
+        loggedIn: req.session.auth,
         userName: req.userName,
         nextQuestion: req.params.nextQuestion
         });
     }else{
       res.render('multiplayer/multiplayer-practice', {
         title: 'Multiplayer',
-        loggedIn: loggedIn,
+        loggedIn: req.session.auth,
         userName: req.userName,
         nextQuestion: req.params.nextQuestion
       });
      }
    });
-  };
+
+   app.get('/chat', mid.assignUserName, function(req, res){
+     res.render('multiplayer/chat', {
+       title: 'Chat'
+     });
+   });
+};

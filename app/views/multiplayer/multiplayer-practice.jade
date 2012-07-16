@@ -18,11 +18,13 @@ script
      nextWord();
   });
 
-  socket.on('userNames', function(data){
-    $(document).ready(function(){
-      $('#users').text(data);
-    });
+  socket.on('users', function (userNames) {
+    $('#currentlyOnline').empty().append($('<span>Online: </span>'));
+    for (var i in userNames) {
+      $('#users').append($('<b>').text(userNames[i]));
+    }
   });
+
 
   socket.on('answerResult', function(data){
     $(document).ready(function(){
@@ -45,7 +47,6 @@ script
 
   $(document).ready(function(){
     $("#buzzer").click(function(event){
-      socket.emit('buzzed', userName)
       $("#answerDiv").removeClass("hide");
       $("#buzzer").addClass("hide");
     });
@@ -54,10 +55,13 @@ script
 
 if(loggedIn)
   div#messageBox
-    li.center
-      != 'Hello ' 
+    li.center 
+      span#currentlyOnline
       span#users
 
+  p
+    != 'Hello '
+    != userName
   div.row-fluid
     ul
       form.well

@@ -44,7 +44,7 @@ script
           clear();
           return $('#chat').addClass('nickname-set');
         }
-        $('#nickname-err').css('visibility', 'visible');
+        $('#nickname-err').removeClass('hide');
       });
       return false;
     });
@@ -67,7 +67,7 @@ body
       form.wrap#set-nickname
         p Please type in your nickname and press enter.
         input#nick
-        p#nickname-err Nickname already in use
+        p.hide#nickname-err Nickname already in use
     #connecting
       .wrap Connecting to socket.io server
     #messages
