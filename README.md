@@ -44,7 +44,7 @@ intend to implement are as follows:
     </ul>
     <li><del>Get all of the views and routes working properly </del></li> 
     <li><del>Get the JSON of questions from Kevin and work on the search function</del></li>
-    <li> Create a suitable chat application as a standalone application using Socket.io, Express, and Node </li> 
+    <li><del> Create a suitable chat application as a standalone application using Socket.io, Express, and Node <del></li> 
     <li><del>Figure out what I am going to use for a server and how to go about setting that up and using it</del></li>
     <li>Core Features</li>
       <ul>
