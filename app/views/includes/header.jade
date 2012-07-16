@@ -1,29 +1,34 @@
 div.navbar.navbar-fixed-top
   div.navbar-inner
     div.container
+      button(type='button', data-toggle="collapse", data-target=".nav-collapse").btn.btn-navbar
+        span.icon-bar
+        span.icon-bar
+        span.icon-bar
       a(href='/home')#logo Its Ac Attack
-      ul.nav
-        li
-          a(href='/home') Home
-        li
-          a(href='/search/0') Search
-        li
-          a(href='/practice/0') Practice
-        li
-          a(href='/multiplayer') Multiplayer
-        li.dropdown
-          a(href='#', data-toggle="dropdown").dropdown-toggle User 
-            b.caret
-          ul.dropdown-menu
-            li
-              a(href='/login') Login
-            li
-              a(href='/logout') Logout 
-            li
-              a(href='/signup') Signup
-            li.divider
-            li
-              a(href='/profile/' + (locals.userName || '')) Profile
+      div.nav-collapse.collapse
+        ul.nav.nav-pull-right
+          li
+            a(href='/home') Home
+          li
+            a(href='/search/0') Search
+          li
+            a(href='/practice/0') Practice
+          li
+            a(href='/multiplayer') Multiplayer
+          li.dropdown
+            a(href='#', data-toggle="dropdown").dropdown-toggle User 
+              b.caret
+            ul.dropdown-menu
+              li
+                a(href='/login') Login
+              li
+                a(href='/logout') Logout 
+              li
+                a(href='/signup') Signup
+              li.divider
+              li
+                a(href='/profile/' + (locals.userName || '')) Profile
 
      script 
        $('.dropdown-toggle').dropdown() 
