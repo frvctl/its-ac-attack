@@ -25,6 +25,11 @@ model_files.forEach(function(file){
 var app = express.createServer();       // express app
 require('./settings').boot(app);      // Bootstrap application settings
 
+// Start the app by listening on <port>
+var port = process.env.PORT || 3000;
+app.listen(port);
+console.log('Express app started on port '+port);
+
 // Bootstrap controllers
 var controllers_path = __dirname + '/app/controllers';
 var controller_files = fs.readdirSync(controllers_path);
@@ -35,8 +40,3 @@ controller_files.forEach(function(file){
 require('./error-handler').boot(app);   // Bootstrap custom error handler
 mongooseAuth.helpExpress(app);          // Add in Dynamic View Helpers
 everyauth.helpExpress(app, { userAlias: 'current_user' });
-
-// Start the app by listening on <port>
-var port = process.env.PORT || 3000;
-app.listen(port);
-console.log('Express app started on port '+port);

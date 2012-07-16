@@ -1,51 +1,16 @@
 var Question = mongoose.model('Question'),
     mid = require('../../middleware.js');
 
-module.exports = function(app){
-  var io = require('socket.io').listen(app),
-      ansIsTrue = false,
-      promptIsTrue = false,
-      afterPromp = false;
-  app.get('/multiplayer', mid.assignUserName, function(req, res){
-    io.sockets.on('connection', function (socket) {
-        
-      /*
-       * When a user hits the buzzer button, broadcast the name of
-       * the user who pressed it and lock all other users out.
-       */
-      socket.on('buzzer pressed', function(buzz){
-        // logic here
-      });
-
-      /*
-       * When a user answers the question, check the answer - which
-       * is handled outside of this logic, then broadcast the result
-       * and if is correct move on to the next question and alot point
-       * to the user who got the answer correct.
-       */
-      socket.on('answer submitted', function(ans){
-        // logic here
-      });
-
-      socket.on('disconnect', function () {
-        //logic here
-      });
-    });
-
+/*
+ * This function is responsible for fetching the question information from the
+ * server and allowing it to be sent to the client. The secondary purpose of
+ * this function is checking answers and returning either true or false, if the
+ * first argument is defined.
+ */
+function getNextQuestionAndCheckAnswer(theAnswer, callback){
   searchIndx = 'History';
-  userAnswer = req.query.answerInput;
-  if(req.loggedIn){
-    if(req.session.auth.twitter){
-      loggedInUsers = req.session.auth.twitter.user.name;
-    }else{
-      loggedInUsers = req.session.auth.facebook.user.name;
-    }
-  }else{
-    loggedInUsers = 'None';
-  }
-  loggedIn = req.session.auth;
-  if(searchIndx){
-    Question.find({$or :                   // $or is similar to logical || also RegEx allows for partial searchs
+  if(searchIndx){                          // RegEx provides for partial searching
+    Question.find({$or :                   // $or is similar to logical ||
       [ {category: {$regex: searchIndx}},  // Searches by categories
         {answer:{$regex: searchIndx}},     // Searches by answers
         {difficulty:{$regex: searchIndx}}, // Searches by difficulty
@@ -55,44 +20,110 @@ module.exports = function(app){
             difficulty:1, question:1,      // all other fields are now undefind
             year:1, tournament:1},
            {skip: 1, limit:1},
-      (function(err, questions){
-        var questionSplit = questions[0].question.split(" ");
-        var regexMatch = questions[0].answer
-                            .match(/(.*?)( \[(.*)\])?$/);
-        var theAns = regexMatch[1];             // First index is everything outside of brackets
-        var insideBrackets = regexMatch[3];     // Third is everything inside brackets
-        if(regexMatch === null) throw "shitstorm";
-        if(insideBrackets === null) throw "nothing in brackets";
-        if(userAnswer){
-          if(userAnswer.toLowerCase() === theAns.toLowerCase()){
-             ansIsTrue = true;
-          }else{
-             ansIsTrue = false;
-          }
+      function(err, question){
+    callback(question);
+    if(theAnswer){
+      var ansTruth;
+      var regexMatch = question[0].answer
+                      .match(/(.*?)( \[(.*)\])?$/);
+      var theAns = regexMatch[1];             // First index is everything outside of brackets
+      var insideBrackets = regexMatch[3];     // Third is everything inside brackets
+      if(regexMatch === null) throw "shitstorm";
+      if(insideBrackets === null) throw "nothing in brackets";
+      if(theAnswer){
+        if(theAnswer.toLowerCase() === theAns.toLowerCase()){
+          ansTruth = true;
+        }else{
+          ansTruth = false;
         }
-    res.render('multiplayer/multiplayer-practice', {
-      title: 'Multiplayer',
-      questions: questions,
-      wordsToRead: questionSplit,
-      buzzTrue: false,
-      loggedIn: loggedIn,
-      loggedInUsers: loggedInUsers,
-      isTrue: ansIsTrue,
-      userName: req.userName
-      });
-     })
-   );
-  }else{
-    res.render('multiplayer/multiplayer-practice', {
-      title: 'Multiplayer',
-      questions: [],
-      wordsToRead: questionSplit,
-      buzzTrue: false,
-      loggedIn: loggedIn,
-      loggedInUsers: loggedInUsers,
-      isTrue: ansIsTrue,
-      userName: req.userName
+        callback(ansTruth);
+        }
+      }
+   });
+ }
+}
+
+module.exports = function(app){
+  var io = require('socket.io').listen(app);
+
+  io.sockets.on('connection', function (socket) {
+    
+    /*
+     * On the initial connection get the question and send it back to the client
+     * side for rendering
+     */
+    getNextQuestionAndCheckAnswer(null, function(question){
+      socket.emit('question',  question);
     });
-   }
- });
-};
+
+
+    /*
+     * Listens for when a user hits the buzzer, at which point we send who hit
+     * the button back to the client side so that all other users can be
+     * informed, the timer can start for the answering user, and all other users
+     * can be locked out
+     */
+    socket.on('buzzer', function(data){
+      socket.emit('buzzerBuzzed', data);
+    });
+
+    /*
+     * When a user answers the question, check the answer, then send the result
+     * back to the client side for further processing
+     */
+    socket.on('answer', function(data){
+      getNextQuestionAndCheckAnswer(data, function(theTruth){
+        socket.emit('answerResult', theTruth);
+      });
+    });
+
+    socket.on('disconnect', function () {
+      //logic here
+    });
+
+  });
+  
+  /*
+   * the nextQuestion param allows for the current question to be determined and
+   * therefore provides an easy way to know both on the client and server side
+   * which question is being handled. The param will the questions id within the
+   * database.
+   */
+  app.param('nextQuestion', function(req, res, next){
+    next();
+  });
+
+  /*
+   * Handles the multiplayer view rendering and some session based user authoriz
+   * ation.
+   */
+  app.get('/multiplayer/:nextQuestion', mid.assignUserName, function(req, res){
+    
+    if(req.loggedIn){
+      if(req.session.auth.twitter){
+        loggedInUsers = req.session.auth.twitter.user.name;
+      }else{
+        loggedInUsers = req.session.auth.facebook.user.name;
+      }
+
+    loggedIn = req.session.auth;
+    
+      res.render('multiplayer/multiplayer-practice', {
+        title: 'Multiplayer',
+        loggedIn: loggedIn,
+        loggedInUsers: loggedInUsers,
+        userName: req.userName,
+        nextQuestion: req.params.nextQuestion
+        });
+    }else{
+      loggedInUsers = 'None';
+      res.render('multiplayer/multiplayer-practice', {
+        title: 'Multiplayer',
+        loggedIn: loggedIn,
+        loggedInUsers: loggedInUsers,
+        userName: req.userName,
+        nextQuestion: req.params.nextQuestion
+      });
+     }
+   });
+  };

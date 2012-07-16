@@ -1,38 +1,59 @@
+script(src="/socket.io/socket.io.js")
+script
+  var socket = io.connect();
+  socket.on('question', function(data){
+     var q = data[0];
+     var words = q.question.split(" ");
+     var pointer = 0;
+     $("#year").text(q.year)
+     $("#difficulty").text(q.difficulty)
+     $("#category").text(q.category)
+     $("#tournament").text(q.tournament)
+     $("#answer").text(q.answer)
+     function nextWord(){
+       $("#question").text(words.slice(0, ++pointer).join(" "))
+       setTimeout(nextWord, 1000)
+     };
+     nextWord();
+  });
+
+  $(document).ready(function(){
+    $('#answerForm').submit(function(event){
+      event.preventDefault();
+      socket.emit('answer', $('#answerInput').val());
+    });
+  });
+
+
+!= channel
+
 if(loggedIn)
   div(id="answerDiv", style="display:all;")
     div.row-fluid
-      each item, i in questions
         ul
           form.well
             li(type="none")
               != 'Difficulty: '
-              != item.difficulty
+              span#difficulty
               != ' | '
               != 'Year: '
-              != item.year
+              span#year
               != ' | '
               != 'Category: '
-              != item.category
+              span#category
               != ' | '
               != 'Tournament: '
-              != item.tournament
+              span#tournament
+            hr    
+            span#question
             hr
-            li(type="none")
-              != 'Question: '
-              != item.question
-            hr
-            li(type="none")
-              != 'Answer: '
-              != item.answer
-
-  if(isTrue)
-    p ITS TRUE WOOO
+            span#answer
 
   div
-    form(name="answerForm", action="", method="get").center.well.search-form
+    form(name="answerForm", action="", method="get")#answerForm.center.well.search-form
       div
-        input(type='text', name='answerInput', placeholder='Answer').input-xlarge.search-query
-      button(type='submit').btn.btn-primary Answer
+        input(type='text', autocomplete="off", name='answerInput', placeholder='Answer')#answerInput.input-xlarge.search-query
+      button(type='submit')#answerButton.btn.btn-primary Answer
 
   li
     != 'Hello ' 

@@ -31,6 +31,17 @@ module.exports = function(app){
             var questionSplit = questions[0]
                                   .question.split(" ");
             
+            function blah(){
+              if(questionSplit[i] !== undefined){
+                wordArray = questionSplit.slice(0, i++);
+                setTimeout(function(){blah();}, 1000);
+              }
+            }
+
+            blah();
+
+            console.log(wordArray);
+
             var regexMatch = questions[0].answer
                               .match(/(.*?)( \[(.*)\])?$/);
             var theAns = regexMatch[1];             // First index is everything outside of brackets

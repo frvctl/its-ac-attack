@@ -8,20 +8,7 @@ script
       $("#buzzer").addClass("hide");
       });
     });
-  
-  var wordArray = [];
-  var i = 0;
 
-  function blah(){
-    if(questionSplit[i] !== undefined){
-      wordArray = questionSplit.slice(0, i++);
-      setInterval(function(){blah();}, 1000);
-    }
-  }
-
-  blah();
-
-  console.log(wordArray);
 
 div
   div.row-fluid
@@ -57,7 +44,8 @@ div
           != item.answer
 
         a(href='/practice/' + (counter+1) + '?answerInput=').btn.btn-primary Continue to the Next Question?
-      
+
+
 div#answerDiv.hide
   form(name="answerForm", action="", method="get").center.well.search-form
     div

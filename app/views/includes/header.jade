@@ -23,7 +23,7 @@ div.navbar.navbar-fixed-top
               a(href='/signup') Signup
             li.divider
             li
-              a(href='/profile/' + userName) Profile
+              a(href='/profile/' + (locals.userName || '')) Profile
 
      script 
        $('.dropdown-toggle').dropdown() 
