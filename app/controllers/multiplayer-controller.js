@@ -134,10 +134,4 @@ module.exports = function(app){
       });
      }
    });
-
-   app.get('/chat', mid.assignUserName, function(req, res){
-     res.render('multiplayer/chat', {
-       title: 'Chat'
-     });
-   });
 };
