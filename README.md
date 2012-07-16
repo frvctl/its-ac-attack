@@ -40,11 +40,11 @@ intend to implement are as follows:
           <li><del> Facebook </del></li>
         </ul>
       <li> Standard Login </li>
-      <li> Session Handling and Controll </li>
+      <li><del> Session Handling and Controll </del></li>
     </ul>
     <li><del>Get all of the views and routes working properly </del></li> 
     <li><del>Get the JSON of questions from Kevin and work on the search function</del></li>
-    <li><del> Create a suitable chat application as a standalone application using Socket.io, Express, and Node <del></li> 
+    <li><del> Create a suitable chat application as a standalone application using Socket.io, Express, and Node </del></li> 
     <li><del>Figure out what I am going to use for a server and how to go about setting that up and using it</del></li>
     <li>Core Features</li>
       <ul>
@@ -55,8 +55,8 @@ intend to implement are as follows:
             </ul>
           <li> Implement the Practice Functionality </li>
             <ul>
-              <li><del> "Read" out the questions <del></li>
-              <li><del> Check the Answer <del></li>
+              <li><del> "Read" out the questions </del></li>
+              <li><del> Check the Answer </del></li>
               <li> Pick where the questions are coming from </li>
             </ul>
           <li> Implement multiplayer Mode </li>
