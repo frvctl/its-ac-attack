@@ -47,6 +47,7 @@ module.exports = function(app){
   var io = require('socket.io').listen(app);
 
   io.sockets.on('connection', function (socket) {
+    socket.emit('userNames', userName);
     
     /*
      * On the initial connection get the question and send it back to the client
@@ -103,16 +104,13 @@ module.exports = function(app){
       res.render('multiplayer/multiplayer-practice', {
         title: 'Multiplayer',
         loggedIn: loggedIn,
-        loggedInUser: loggedInUser,
         userName: req.userName,
         nextQuestion: req.params.nextQuestion
         });
     }else{
-      loggedInUser = 'None';
       res.render('multiplayer/multiplayer-practice', {
         title: 'Multiplayer',
         loggedIn: loggedIn,
-        loggedInUser: loggedInUser,
         userName: req.userName,
         nextQuestion: req.params.nextQuestion
       });

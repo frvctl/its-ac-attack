@@ -18,9 +18,14 @@ script
      nextWord();
   });
 
+  socket.on('userNames', function(data){
+    $(document).ready(function(){
+      $('#users').text(data);
+    });
+  });
+
   socket.on('answerResult', function(data){
     $(document).ready(function(){
-      console.log(data);
       if(data == true){
         $('#answer').text('Your answer is correct!');
       }else{
@@ -49,9 +54,9 @@ script
 
 if(loggedIn)
   div#messageBox
-    p.center
+    li.center
       != 'Hello ' 
-      !=  userName
+      span#users
 
   div.row-fluid
     ul
