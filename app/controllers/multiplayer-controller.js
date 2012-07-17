@@ -46,23 +46,18 @@ function getNextQuestionAndCheckAnswer(theAnswer, callback){
 
 module.exports = function(app){
   var io = require('socket.io').listen(app),
-      nicknames = {};
+      users = {};
 
   io.sockets.on('connection', function (socket) {
     socket.on('user message', function (msg) {
        socket.broadcast.emit('user message', socket.nickname, msg);
     });
-
-    socket.on('nickname', function (nick, fn) {
-       if (nicknames[nick]) {
-         fn(true);
-       } else {
-         fn(false);
-         nicknames[nick] = socket.nickname = nick;
-         socket.broadcast.emit('announcement', nick + ' connected');
-         io.sockets.emit('nicknames', nicknames);
-       }
+   
+    socket.on('user', function(name){
+        socket.broadcast.emit('announcement', name + ' connected');
+        socket.emit('nicknames', name);
     });
+    
 
     /*
      * On the initial connection get the question and send it back to the client

@@ -66,11 +66,6 @@ function bootApplication(app) {
     app.use(mongooseAuth.middleware());
   });
 
-  // Setup ejs views as default, with .html as the extension
-  //app.set('views', __dirname + '/views')
-  //app.register('.html', require('ejs'))
-  //app.set('view engine', 'html')
-
   // Some dynamic view helpers
   app.dynamicHelpers({
 
@@ -78,13 +73,9 @@ function bootApplication(app) {
       return req;
     },
 
-    hasMessages: function(req){
-      if (!req.session) return false;
-      return Object.keys(req.session.flash || {}).length;
+    session: function(req){
+      return req.session;
     },
-
-    // flash messages
-    messages: require('express-messages'),
 
     // dateformat helper. Thanks to gh-/loopj/commonjs-date-formatting
     dateformat: function(req, res) {
