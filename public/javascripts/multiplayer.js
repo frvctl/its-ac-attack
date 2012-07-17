@@ -8,14 +8,13 @@ socket.on('connect', function () {
     socket.emit('user', aUser, function(set){
       if(!set){
         clear();
-        return $('#chat').addClass('nickname-set');
+        $('#chat').addClass('connected');
+        $('#connecting').addClass('hide');
       }
       $('#nickname-err').removeClass('hide');
     });
     return false;
   }
-  $('#chat').addClass('connected');
-  $('#connecting').addClass('hide');
 });
 
 socket.on('question', function(data){
