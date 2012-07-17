@@ -19,6 +19,7 @@ socket.on('question', function(data){
   $("#answer").text(q.answer);
   function nextWord(){
     $("#question").text(words.slice(0, ++pointer).join(" "));
+    $("<span>").css("visibility", "hidden").text(words.slice(pointer).join(" ")).appendTo("#question");
     reading = setTimeout(nextWord, 1000*60/500);
   }
   nextWord();
@@ -54,13 +55,13 @@ $(document).ready(function(){
 });
 
 socket.on('announcement', function (msg) {
-  $('#lines').append($('<p>').append($('<em>').text(msg)));
+  $('#lines').append($('<p>').append($('<em>').text(" " + msg + " ")));
 });
 
 socket.on('names', function (names) {
   $('#nicknames').empty().append($('<span>Online: </span>'));
   for (var i in names) {
-    $('#nicknames').append($('<b>').text(names[i]));
+    $('#nicknames').append($('<b>').text(" " + names[i] + " "));
   }
 });
 
@@ -86,7 +87,6 @@ $(function(){
         clear();
         return $('#chat').addClass('nickname-set');
       }
-      $('#nickname-err').removeClass('hide');
     });
     return false;
   }
