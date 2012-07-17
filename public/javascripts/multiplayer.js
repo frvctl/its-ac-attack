@@ -8,6 +8,7 @@ socket.on('connect', function () {
     socket.emit('user', aUser, function(set){
       if(!set){
         clear();
+        $('#chat').addClass('nickname-set');
         $('#chat').addClass('connected');
         $('#connecting').addClass('hide');
       }
@@ -46,6 +47,7 @@ socket.on('answerResult', function(data){
   });
 });
 
+// Submitting Answers
 $(document).ready(function(){
   $('#answerForm').submit(function(event){
     event.preventDefault();
@@ -55,6 +57,7 @@ $(document).ready(function(){
   });
 });
 
+// Buzzer
 $(document).ready(function(){
   $("#buzzer").click(function(event){
     clearTimeout(reading);
@@ -63,10 +66,12 @@ $(document).ready(function(){
   });
 });
 
+// General Announcements
 socket.on('announcement', function (msg) {
   $('#lines').append($('<p>').append($('<em>').text(" " + msg + " ")));
 });
 
+//
 socket.on('names', function (names) {
   $('#nicknames').empty().append($('<span>Online: </span>'));
   for (var i in names) {

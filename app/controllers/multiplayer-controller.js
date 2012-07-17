@@ -111,7 +111,7 @@ module.exports = function(app){
        if (!socket.name) return;
        delete users[socket.name];
        socket.broadcast.emit('announcement', socket.name + ' disconnected');
-       socket.broadcast.emit('nicknames', users);
+       socket.broadcast.emit('names', users);
     });
   });
   
