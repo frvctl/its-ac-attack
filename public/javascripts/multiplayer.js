@@ -3,6 +3,11 @@ var aUser = document.getElementById("userName").value;
 var reading;
 
 
+socket.on('connect', function () {
+  $('#chat').addClass('connected');
+  $('#connecting').addClass('hide');
+});
+
 if(aUser){
   socket.emit('user', aUser);
 }
@@ -50,11 +55,6 @@ $(document).ready(function(){
     $("#answerDiv").removeClass("hide");
     $("#buzzer").addClass("hide");
   });
-});
-
-socket.on('connect', function () {
-  $('#chat').addClass('connected');
-  $('#connecting').addClass('hide');
 });
 
 socket.on('announcement', function (msg) {

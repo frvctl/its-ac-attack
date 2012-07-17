@@ -93,7 +93,7 @@ module.exports = function(app){
     socket.on('disconnect', function () {
        if (!socket.name) return;
 
-       delete users[socket.name];
+       users.pop(socket.name);
        socket.broadcast.emit('announcement', socket.name + ' disconnected');
        socket.broadcast.emit('nicknames', users);
     });
