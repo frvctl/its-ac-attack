@@ -4,15 +4,14 @@ var reading;
 
 
 socket.on('connect', function () {
+  $('#chat').addClass('connected');
+  $('#connecting').addClass('hide');
   if(aUser){
     socket.emit('user', aUser, function(set){
       if(!set){
         clear();
         $('#chat').addClass('nickname-set');
-        $('#chat').addClass('connected');
-        $('#connecting').addClass('hide');
       }
-      $('#nickname-err').removeClass('hide');
     });
     return false;
   }
@@ -47,23 +46,8 @@ socket.on('answerResult', function(data){
   });
 });
 
-// Submitting Answers
-$(document).ready(function(){
-  $('#answerForm').submit(function(event){
-    event.preventDefault();
-    socket.emit('answer', $('#answerInput').val());
-    $('#answerDiv').addClass("hide");
-    $('#nextQuestionButton').removeClass("hide");
-  });
-});
-
-// Buzzer
-$(document).ready(function(){
-  $("#buzzer").click(function(event){
-    clearTimeout(reading);
-    $("#answerDiv").removeClass("hide");
-    $("#buzzer").addClass("hide");
-  });
+socket.on('theBuzzer', function(data){
+  console.log('theBuzzer recieved' + data);
 });
 
 // General Announcements
@@ -93,7 +77,7 @@ socket.on('error', function (e) {
   message('System', e ? e : 'A unknown error occurred');
 });
 
-// dom manipulation
+// Send messages
 $(document).ready(function(){
   $('#send-message').submit(function () {
     message('me', $('#message').val());
@@ -103,6 +87,27 @@ $(document).ready(function(){
     return false;
   });
 });
+
+// Submitting Answers
+$(document).ready(function(){
+  $('#answerForm').submit(function(event){
+    event.preventDefault();
+    socket.emit('answer', $('#answerInput').val());
+    $('#answerDiv').addClass("hide");
+    $('#nextQuestionButton').removeClass("hide");
+  });
+});
+
+// Buzzer
+$(document).ready(function(){
+  $("#buzzer").click(function(event){
+    socket.emit('buzzed', aUser);
+    clearTimeout(reading);
+    $("#answerDiv").removeClass("hide");
+    $("#buzzer").addClass("hide");
+  });
+});
+
 
 
 function message (from, msg) {

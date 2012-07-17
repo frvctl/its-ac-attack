@@ -93,7 +93,7 @@ module.exports = function(app){
      * can be locked out
      */
     socket.on('buzzed', function(data){
-      socket.emit('', data);
+      socket.broadcast.emit('theBuzzer', data);
     });
 
     /*
