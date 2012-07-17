@@ -92,8 +92,8 @@ module.exports = function(app){
 
     socket.on('disconnect', function () {
        if (!socket.name) return;
-
-       users.pop(socket.name);
+       var index = users.indexOf(socket.name);
+       users.splice(index, 1);
        socket.broadcast.emit('announcement', socket.name + ' disconnected');
        socket.broadcast.emit('nicknames', users);
     });
