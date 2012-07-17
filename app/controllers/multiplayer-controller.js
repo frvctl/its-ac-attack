@@ -69,7 +69,6 @@ module.exports = function(app){
     socket.on('user', function(name, fn){
       if(users[name]){
         fn(true);
-        console.log('nickname in use, function returned true')
       }else{
         fn(false);
         users[name] = socket.name = name;
@@ -110,9 +109,7 @@ module.exports = function(app){
 
     socket.on('disconnect', function () {
        if (!socket.name) return;
-       console.log('before discconect ' + users[socket.name]);
        delete users[socket.name];
-       console.log('after delete ' + users[users.name]);
        socket.broadcast.emit('announcement', socket.name + ' disconnected');
        socket.broadcast.emit('nicknames', users);
     });

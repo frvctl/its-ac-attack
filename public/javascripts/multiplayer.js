@@ -4,6 +4,16 @@ var reading;
 
 
 socket.on('connect', function () {
+  if(aUser){
+    socket.emit('user', aUser, function(set){
+      if(!set){
+        clear();
+        return $('#chat').addClass('nickname-set');
+      }
+      $('#nickname-err').removeClass('hide');
+    });
+    return false;
+  }
   $('#chat').addClass('connected');
   $('#connecting').addClass('hide');
 });
@@ -80,18 +90,6 @@ socket.on('error', function (e) {
 });
 
 // dom manipulation
-$(function(){
-  if(aUser){
-    socket.emit('user', aUser, function(set){
-      if(!set){
-        clear();
-        return $('#chat').addClass('nickname-set');
-      }
-    });
-    return false;
-  }
-});
-
 $(document).ready(function(){
   $('#send-message').submit(function () {
     message('me', $('#message').val());
