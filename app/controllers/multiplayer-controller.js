@@ -8,7 +8,7 @@ var Question = mongoose.model('Question'),
  * this function is checking answers and returning either true or false, if the
  * first argument is defined.
  */
-function getNextQuestionAndCheckAnswer(theAnswer, callback){
+function getNextQuestionAndCheckAnswer(theAnswer, numSkip, callback){
   searchIndx = 'History';
   if(searchIndx){                          // RegEx provides for partial searching
     Question.find({$or :                   // $or is similar to logical ||
@@ -20,7 +20,7 @@ function getNextQuestionAndCheckAnswer(theAnswer, callback){
       ] }, {category:1, answer:1,          // Fields which are specified to return info
             difficulty:1, question:1,      // all other fields are now undefind
             year:1, tournament:1},
-           {skip: 1, limit:1},
+           {skip: numSkip, limit:1},
       function(err, question){
     callback(question);
     if(theAnswer){
@@ -72,7 +72,7 @@ module.exports = function(app){
       }else{
         users[name] = socket.name = name;
         socket.broadcast.emit('announcement', name + ' connected');
-        socket.emit('names', users);
+        io.sockets.emit('names', users);
       }
     });
     
@@ -81,8 +81,11 @@ module.exports = function(app){
      * On the initial connection get the question and send it back to the client
      * side for rendering
      */
-    getNextQuestionAndCheckAnswer(null, function(question){
-      socket.emit('question',  question);
+    socket.on('question', function(questNum){
+      getNextQuestionAndCheckAnswer(null, questNum, function(question){
+        socket.quesNum = questNum;
+        io.sockets.emit('currentQuestion',  question);
+      });
     });
 
     /*
@@ -100,7 +103,8 @@ module.exports = function(app){
      * back to the client side for further processing
      */
     socket.on('answer', function(data){
-      getNextQuestionAndCheckAnswer(data, function(theTruth){
+      console.log(socket.quesNum);
+      getNextQuestionAndCheckAnswer(data, socket.quesNum, function(theTruth){
         socket.emit('answerResult', theTruth);
       });
     });
@@ -110,7 +114,7 @@ module.exports = function(app){
        if (!socket.name) return;
        delete users[socket.name];
        socket.broadcast.emit('announcement', socket.name + ' disconnected');
-       socket.broadcast.emit('names', users);
+       io.sockets.emit('names', users);
     });
   });
   
@@ -129,9 +133,12 @@ module.exports = function(app){
    * ation.
    */
   app.get('/multiplayer/:nextQuestion', mid.assignUserName, function(req, res){
+    var ques = req.params;
+    var quesNum = parseInt(ques.nextQuestion, 10);
     if(req.loggedIn){
       res.render('multiplayer/multiplayer-practice', {
         title: 'Multiplayer',
+        counter: quesNum,
         loggedIn: req.session.auth,
         userName: req.userName,
         nextQuestion: req.params.nextQuestion
@@ -139,6 +146,7 @@ module.exports = function(app){
     }else{
       res.render('multiplayer/multiplayer-practice', {
         title: 'Multiplayer',
+        counter: quesNum,
         loggedIn: req.session.auth,
         userName: req.userName,
         nextQuestion: req.params.nextQuestion

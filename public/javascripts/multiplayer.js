@@ -1,5 +1,6 @@
 var socket = io.connect();
 var aUser = document.getElementById("userName").value;
+var questNum = document.getElementById("questionNumber").value;
 var reading;
 
 
@@ -7,11 +8,12 @@ socket.on('connect', function () {
   $('#chat').addClass('connected');
   $('#connecting').addClass('hide');
   socket.emit('user', aUser);
+  socket.emit('question', questNum);
   clear();
   $('#chat').addClass('nickname-set');
 });
 
-socket.on('question', function(data){
+socket.on('currentQuestion', function(data){
   var q = data[0];
   var words = q.question.split(" ");
   var pointer = 0;
