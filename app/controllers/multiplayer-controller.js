@@ -46,7 +46,7 @@ function getNextQuestionAndCheckAnswer(theAnswer, callback){
 
 module.exports = function(app){
   var io = require('socket.io').listen(app),
-      users = [];
+      users = {};
 
   io.configure('development', function(){
     io.set('log level', 2);
@@ -73,10 +73,13 @@ module.exports = function(app){
     });
    
     socket.on('user', function(name){
-      users.push(name);
-      socket.name = name;
-      socket.broadcast.emit('announcement', name + ' connected');
-      socket.emit('names', users);
+      if(users[name]){
+        console.log('name in use');
+      }else{
+        users[name] = socket.name = name;
+        socket.broadcast.emit('announcement', name + ' connected');
+        socket.emit('names', users);
+      }
     });
     
 
@@ -111,14 +114,11 @@ module.exports = function(app){
 
     socket.on('disconnect', function () {
        if (!socket.name) return;
-       var index = users.indexOf(socket.name);
-       console.log(users);
-       console.log('The index is ' + index + ' and the user name is ' + socket.name);
-       users.splice(index, 1);
+
+       delete users[socket.name];
        socket.broadcast.emit('announcement', socket.name + ' disconnected');
        socket.broadcast.emit('nicknames', users);
     });
-
   });
   
   /*
