@@ -64,10 +64,12 @@ module.exports = function(app){
        socket.broadcast.emit('user message', socket.name, msg);
     });
    
-    socket.on('user', function(name){
+    socket.on('user', function(name, fn){
       if(users[name]){
-        console.log('name in use');
+        fn(true);
+        console.log('nickname in use, function returned true')
       }else{
+        fn(false);
         users[name] = socket.name = name;
         socket.broadcast.emit('announcement', name + ' connected');
         socket.emit('names', users);

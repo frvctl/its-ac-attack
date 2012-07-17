@@ -6,9 +6,6 @@ var reading;
 socket.on('connect', function () {
   $('#chat').addClass('connected');
   $('#connecting').addClass('hide');
-  if(aUser){
-    socket.emit('user', aUser);
-  }
 });
 
 socket.on('question', function(data){
@@ -82,7 +79,18 @@ socket.on('error', function (e) {
 });
 
 // dom manipulation
-$(document).ready(function(){  
+$(function(){
+  if(aUser){
+    socket.emit('user', aUser, function(set){
+      if(!set){
+        clear();
+        return $('#chat').addClass('nickname-set');
+      }
+      $('#nickname-err').removeClass('hide');
+    });
+    return false;
+  }
+
   $('#send-message').submit(function () {
     message('me', $('#message').val());
     socket.emit('user message', $('#message').val());
