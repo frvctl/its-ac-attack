@@ -48,6 +48,25 @@ module.exports = function(app){
   var io = require('socket.io').listen(app),
       users = [];
 
+  io.configure('development', function(){
+    io.set('log level', 2);
+    io.set('transports', ['websocket']);
+  });
+
+  io.configure('production', function(){
+    io.enable('browser client minification');
+    io.enable('browser client etag');
+    io.enable('browser client gzip');
+    io.set('log level', 1);
+    io.set('transports', [
+      'websocket'
+     ,'flashsocket'
+     ,'htmlfile'
+     ,'xhr-polling'
+     ,'jsonp-polling'
+     ]);
+  });
+
   io.sockets.on('connection', function (socket) {
     socket.on('user message', function (msg) {
        socket.broadcast.emit('user message', socket.name, msg);
@@ -93,6 +112,8 @@ module.exports = function(app){
     socket.on('disconnect', function () {
        if (!socket.name) return;
        var index = users.indexOf(socket.name);
+       console.log(users);
+       console.log('The index is ' + index + ' and the user name is ' + socket.name);
        users.splice(index, 1);
        socket.broadcast.emit('announcement', socket.name + ' disconnected');
        socket.broadcast.emit('nicknames', users);
