@@ -91,11 +91,11 @@ module.exports = function(app){
 
 
     socket.on('disconnect', function () {
-       if (!socket.nickname) return;
+       if (!socket.name) return;
 
-       delete nicknames[socket.nickname];
-       socket.broadcast.emit('announcement', socket.nickname + ' disconnected');
-       socket.broadcast.emit('nicknames', nicknames);
+       delete users[socket.name];
+       socket.broadcast.emit('announcement', socket.name + ' disconnected');
+       socket.broadcast.emit('nicknames', users);
     });
 
   });
