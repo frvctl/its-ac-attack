@@ -56,6 +56,8 @@ module.exports = function(app){
     io.enable('browser client minification');
     io.enable('browser client etag');
     io.enable('browser client gzip');
+    io.set('transports', ["xhr-polling"]);
+    io.set('polling duration', 10);
     io.set('log level', 1);
   });
 
@@ -108,8 +110,9 @@ module.exports = function(app){
 
     socket.on('disconnect', function () {
        if (!socket.name) return;
-
+       console.log('before discconect ' + users[socket.name]);
        delete users[socket.name];
+       console.log('after delete ' + users[users.name]);
        socket.broadcast.emit('announcement', socket.name + ' disconnected');
        socket.broadcast.emit('nicknames', users);
     });
