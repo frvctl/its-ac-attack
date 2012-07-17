@@ -6,11 +6,10 @@ var reading;
 socket.on('connect', function () {
   $('#chat').addClass('connected');
   $('#connecting').addClass('hide');
+  if(aUser){
+    socket.emit('user', aUser);
+  }
 });
-
-if(aUser){
-  socket.emit('user', aUser);
-}
 
 socket.on('question', function(data){
   var q = data[0];
@@ -23,7 +22,7 @@ socket.on('question', function(data){
   $("#answer").text(q.answer);
   function nextWord(){
     $("#question").text(words.slice(0, ++pointer).join(" "));
-    reading = setTimeout(nextWord, 1000);
+    reading = setTimeout(nextWord, 1000*60/500);
   }
   nextWord();
 });
