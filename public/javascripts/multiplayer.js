@@ -6,15 +6,9 @@ var reading;
 socket.on('connect', function () {
   $('#chat').addClass('connected');
   $('#connecting').addClass('hide');
-  if(aUser){
-    socket.emit('user', aUser, function(set){
-      if(!set){
-        clear();
-        $('#chat').addClass('nickname-set');
-      }
-    });
-    return false;
-  }
+  socket.emit('user', aUser);
+  clear();
+  $('#chat').addClass('nickname-set');
 });
 
 socket.on('question', function(data){

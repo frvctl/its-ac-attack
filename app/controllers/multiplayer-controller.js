@@ -68,9 +68,8 @@ module.exports = function(app){
    
     socket.on('user', function(name, fn){
       if(users[name]){
-        fn(true);
+        socket.emit('names', users);
       }else{
-        fn(false);
         users[name] = socket.name = name;
         socket.broadcast.emit('announcement', name + ' connected');
         socket.emit('names', users);
