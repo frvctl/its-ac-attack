@@ -55,7 +55,7 @@ module.exports = function(app){
   io.configure('production', function(){
     io.enable('browser client minification');
     io.enable('browser client etag');
-    io.enable('browser client gzip');
+    io.disable('browser client gzip');
     io.set('transports', ["xhr-polling"]);
     io.set('polling duration', 10);
     io.set('log level', 1);
