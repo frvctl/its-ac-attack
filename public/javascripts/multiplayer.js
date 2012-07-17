@@ -90,7 +90,9 @@ $(function(){
     });
     return false;
   }
+});
 
+$(document).ready(function(){
   $('#send-message').submit(function () {
     message('me', $('#message').val());
     socket.emit('user message', $('#message').val());
@@ -99,6 +101,7 @@ $(function(){
     return false;
   });
 });
+
 
 function message (from, msg) {
   $('#lines').append($('<p>').append($('<b>').text(from), msg));
