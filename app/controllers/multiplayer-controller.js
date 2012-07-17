@@ -54,6 +54,7 @@ module.exports = function(app){
     });
    
     socket.on('user', function(name){
+        users[name] = socket.nickname = name;
         socket.broadcast.emit('announcement', name + ' connected');
         socket.emit('nicknames', name);
     });
