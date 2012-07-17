@@ -50,7 +50,6 @@ module.exports = function(app){
 
   io.configure('development', function(){
     io.set('log level', 2);
-    io.set('transports', ['websocket']);
   });
 
   io.configure('production', function(){
@@ -58,13 +57,6 @@ module.exports = function(app){
     io.enable('browser client etag');
     io.enable('browser client gzip');
     io.set('log level', 1);
-    io.set('transports', [
-      'websocket'
-     ,'flashsocket'
-     ,'htmlfile'
-     ,'xhr-polling'
-     ,'jsonp-polling'
-     ]);
   });
 
   io.sockets.on('connection', function (socket) {
