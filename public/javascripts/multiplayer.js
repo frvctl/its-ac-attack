@@ -61,10 +61,10 @@ socket.on('announcement', function (msg) {
   $('#lines').append($('<p>').append($('<em>').text(msg)));
 });
 
-socket.on('nicknames', function (nicknames) {
+socket.on('names', function (names) {
   $('#nicknames').empty().append($('<span>Online: </span>'));
-  for (var i in nicknames) {
-    $('#nicknames').append($('<b>').text(nicknames[i]));
+  for (var i in names) {
+    $('#nicknames').append($('<b>').text(names[i]));
   }
 });
 

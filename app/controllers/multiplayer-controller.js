@@ -50,13 +50,13 @@ module.exports = function(app){
 
   io.sockets.on('connection', function (socket) {
     socket.on('user message', function (msg) {
-       socket.broadcast.emit('user message', socket.nickname, msg);
+       socket.broadcast.emit('user message', socket.name, msg);
     });
    
     socket.on('user', function(name){
-        users[name] = socket.nickname = name;
+        users[name] = socket.name = name;
         socket.broadcast.emit('announcement', name + ' connected');
-        socket.emit('nicknames', name);
+        socket.emit('names', users);
     });
     
 
