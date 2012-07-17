@@ -46,7 +46,7 @@ function getNextQuestionAndCheckAnswer(theAnswer, callback){
 
 module.exports = function(app){
   var io = require('socket.io').listen(app),
-      users = {};
+      users = [];
 
   io.sockets.on('connection', function (socket) {
     socket.on('user message', function (msg) {
@@ -54,9 +54,10 @@ module.exports = function(app){
     });
    
     socket.on('user', function(name){
-        users[name] = socket.name = name;
-        socket.broadcast.emit('announcement', name + ' connected');
-        socket.emit('names', users);
+      users.push(name);
+      socket.name = name;
+      socket.broadcast.emit('announcement', name + ' connected');
+      socket.emit('names', users);
     });
     
 
