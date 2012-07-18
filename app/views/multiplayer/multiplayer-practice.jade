@@ -32,7 +32,8 @@ if(loggedIn)
   input(type='hidden', value=userName)#userName
 
   div#buttons.center
-    button#buzzer.btn.btn-primary.btn-large Buzzer!
+    button#start.btn.btn-primary.btn-large Start the Question!
+    button#buzzer.hide.btn.btn-primary.btn-large Buzzer!
     a(href='/multiplayer/' + (counter+1) + '?answerInput=')#nextQuestionButton.btn.btn-primary.hide Next Question!
 
   hr

@@ -8,7 +8,6 @@ socket.on('connect', function () {
   $('#chat').addClass('connected');
   $('#connecting').addClass('hide');
   socket.emit('user', aUser);
-  socket.emit('question', questNum);
   clear();
   $('#chat').addClass('nickname-set');
 });
@@ -101,6 +100,14 @@ $(document).ready(function(){
     clearTimeout(reading);
     $("#answerDiv").removeClass("hide");
     $("#buzzer").addClass("hide");
+  });
+});
+
+$(document).ready(function(){
+  $('#start').click(function(event){
+    socket.emit('question', questNum);
+    $("#buzzer").removeClass("hide");
+    $("#skip").removeClass("hide");
   });
 });
 
