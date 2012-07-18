@@ -72,8 +72,8 @@ socket.on('error', function (e) {
   message('System', e ? e : 'A unknown error occurred');
 });
 
-// Send messages
 $(document).ready(function(){
+  // Send messages
   $('#send-message').submit(function () {
     message('me', $('#message').val());
     socket.emit('user message', $('#message').val());
@@ -81,31 +81,29 @@ $(document).ready(function(){
     $('#lines').get(0).scrollTop = 10000000;
     return false;
   });
-});
 
-// Submitting Answers
-$(document).ready(function(){
+  // Submitting Answers
   $('#answerForm').submit(function(event){
     event.preventDefault();
     socket.emit('answer', $('#answerInput').val());
     $('#answerDiv').addClass("hide");
     $('#nextQuestionButton').removeClass("hide");
   });
-});
 
-// Buzzer
-$(document).ready(function(){
+  // Buzzer
   $("#buzzer").click(function(event){
     socket.emit('buzzed', aUser);
     clearTimeout(reading);
     $("#answerDiv").removeClass("hide");
+    $('#skip').addClass("hide");
     $("#buzzer").addClass("hide");
   });
-});
 
-$(document).ready(function(){
+  // Start the question
   $('#start').click(function(event){
     socket.emit('question', questNum);
+    $('#start').addClass("hide");
+    $('#information').removeClass("hide");
     $("#buzzer").removeClass("hide");
     $("#skip").removeClass("hide");
   });

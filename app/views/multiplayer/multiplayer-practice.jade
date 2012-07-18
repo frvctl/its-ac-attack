@@ -5,7 +5,7 @@ if(loggedIn)
 
   div.row-fluid
     ul
-      form.well
+      form#information.well.hide
         li(type="none")
           != 'Difficulty: '
           span#difficulty
@@ -34,6 +34,7 @@ if(loggedIn)
   div#buttons.center
     button#start.btn.btn-primary.btn-large Start the Question!
     button#buzzer.hide.btn.btn-primary.btn-large Buzzer!
+    button#skip.hide.btn.btn-primary.btn-large Skip this Question
     a(href='/multiplayer/' + (counter+1) + '?answerInput=')#nextQuestionButton.btn.btn-primary.hide Next Question!
 
   hr

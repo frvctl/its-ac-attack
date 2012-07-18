@@ -2,14 +2,30 @@ var Question = mongoose.model('Question'),
     Chat = mongoose.model('Chat'),
     mid = require('../../middleware.js');
 
-/*
- * This function is responsible for fetching the question information from the
- * server and allowing it to be sent to the client. The secondary purpose of
- * this function is checking answers and returning either true or false, if the
- * first argument is defined.
- */
-function getNextQuestionAndCheckAnswer(theAnswer, numSkip, callback){
-  searchIndx = 'History';
+/* ------------------------------------------------------------------------------ *\
+ * Overview:                                                                      *
+ * ===========                                                                    *
+ * This function is responsible for fetching the question information from the    *
+ * server and allowing it to be sent to the client. The secondary purpose of      *
+ * this function is checking answers and returning either true or false, if the   *
+ * first argument is defined. The numToSkip argument allows the next question     *
+ * to be accessed. The searchIndx argument allows questions from a different      *
+ * search to be accessed.                                                         *
+ * -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-  *
+ * Arguments:                                                                     *
+ * ============                                                                   *
+ * userAnswer -> Accepts a string only, used to check the submitted answer and    *
+ *               return either true - the answer is true - or false - the answer  *
+ *               is false                                                         *
+ * numToSkip -> Must be an integer, simply the number of questions from the first *
+ *              that will be skipped over, see the mongodb docs for more info on  *
+ *              how this works                                                    *
+ * searchIndx -> Must be a string, the search method used to retrieve quesitons   *
+ * callback -> A generic call back to get the information, will either return a   *
+ *             question - callback(question) - or a boolean that represents the   *
+ *             truth of an answer.                                                *
+\* ------------------------------------------------------------------------------ */
+function getNextQuestionAndCheckAnswer(userAnswer, numToSkip, searchIndx, callback){
   if(searchIndx){                          // RegEx provides for partial searching
     Question.find({$or :                   // $or is similar to logical ||
       [ {category: {$regex: searchIndx}},  // Searches by categories
@@ -20,10 +36,10 @@ function getNextQuestionAndCheckAnswer(theAnswer, numSkip, callback){
       ] }, {category:1, answer:1,          // Fields which are specified to return info
             difficulty:1, question:1,      // all other fields are now undefind
             year:1, tournament:1},
-           {skip: numSkip, limit:1},
+           {skip: numToSkip, limit:1},
       function(err, question){
     callback(question);
-    if(theAnswer){
+    if(userAnswer){
       var ansTruth;
       var regexMatch = question[0].answer
                       .match(/(.*?)( \[(.*)\])?$/);
@@ -31,8 +47,8 @@ function getNextQuestionAndCheckAnswer(theAnswer, numSkip, callback){
       var insideBrackets = regexMatch[3];     // Third is everything inside brackets
       if(regexMatch === null) throw "shitstorm";
       if(insideBrackets === null) throw "nothing in brackets";
-      if(theAnswer){
-        if(theAnswer.toLowerCase() === theAns.toLowerCase()){
+      if(userAnswer){
+        if(userAnswer.toLowerCase() === theAns.toLowerCase()){
           ansTruth = true;
         }else{
           ansTruth = false;
@@ -40,14 +56,20 @@ function getNextQuestionAndCheckAnswer(theAnswer, numSkip, callback){
         callback(ansTruth);
         }
       }
-   });
- }
+    });
+  }
 }
 
 module.exports = function(app){
   var io = require('socket.io').listen(app),
       users = {};
-
+  
+  /*
+   * Configures socket.io for different Node.js enviromental variables. Production
+   * lowers the logging to an absolute minimum and disables client gzip which
+   * causes problems with this version of node as well as a few other things to
+   * increase performance.
+   */
   io.configure('development', function(){
     io.set('log level', 2);
   });
@@ -62,11 +84,24 @@ module.exports = function(app){
   });
 
   io.sockets.on('connection', function (socket) {
+    
+   /*
+    * On a user message - as in when the chat form submits - emit to everyone except
+    * the client who sent the message the name of the person sending the message
+    * and the message content.
+    */
     socket.on('user message', function (msg) {
        socket.broadcast.emit('user message', socket.name, msg);
     });
    
-    socket.on('user', function(name, fn){
+    /*
+     * On a connection user is emited, at which point the user is checked against
+     * those who are already in the users object, if they are the users are emited
+     * back to the client who connected, if they are not in the users object they
+     * are added to it and an announcement is made to all users of the person who
+     * connected. Also the users are emited to every client.
+     */
+    socket.on('user', function(name){
       if(users[name]){
         socket.emit('names', users);
       }else{
@@ -75,14 +110,13 @@ module.exports = function(app){
         io.sockets.emit('names', users);
       }
     });
-    
-
     /*
-     * On the initial connection get the question and send it back to the client
-     * side for rendering
+     * On a question - as in when the start question button is pressed - the current
+     * question is fetched from the server using the getNextQuestion.. method and
+     * it is then emited to every client.
      */
     socket.on('question', function(questNum){
-      getNextQuestionAndCheckAnswer(null, questNum, function(question){
+      getNextQuestionAndCheckAnswer(null, questNum, 'History', function(question){
         socket.quesNum = questNum;
         io.sockets.emit('currentQuestion',  question);
       });
@@ -104,7 +138,7 @@ module.exports = function(app){
      */
     socket.on('answer', function(data){
       console.log(socket.quesNum);
-      getNextQuestionAndCheckAnswer(data, socket.quesNum, function(theTruth){
+      getNextQuestionAndCheckAnswer(data, socket.quesNum, 'History', function(theTruth){
         socket.emit('answerResult', theTruth);
       });
     });

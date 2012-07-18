@@ -63,6 +63,6 @@ intend to implement are as follows:
             <ul>
               <li><del> Login is dependant on this being successfull <del></li>
               <li> Buzzer with timer, after buzz person is locked out </li>
-          <li> Implement the chat </li>
+          <li><del> Implement the chat <del></li>
       </ul>
 </ul>
