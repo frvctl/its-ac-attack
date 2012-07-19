@@ -32,9 +32,9 @@ intend to implement are as follows:
 ## Todo List:
 
 <ul>
-  <li> Establish an effective user authorization system </li>
+  <li><del> Establish an effective user authorization system <del></li>
     <ul>
-      <li> Through Social Media </li>
+      <li><del> Through Social Websites <del></li>
         <ul>
           <li><del> Twitter </del></li>
           <li><del> Facebook </del></li>
