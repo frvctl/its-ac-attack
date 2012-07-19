@@ -43,12 +43,11 @@ if(loggedIn)
     p.hide#nickname-err This is already in use
     #connecting
       .wrap Connecting to socket.io server
-    form.well#messages
+    form#messages
       #nicknames
       #lines
     form#send-message
-      input#message
-      button#sendButton.btn.btn-primary.btn-large Send
+      input(placeholder='Write a message...')#message
 
 if(!loggedIn)
   p.center

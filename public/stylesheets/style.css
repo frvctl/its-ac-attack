@@ -85,8 +85,6 @@ p {
     line-height: 1;
 }
 
-
-
 #logo:hover {
     color: #fff;
     text-decoration: none;
@@ -121,16 +119,6 @@ footer ul{
 footer ul li{
     float:right;
     margin-left: 10px;
-}
-
-/* Forms */
-
-input, textarea, select, .undeditable-input  {
-    border: 1px solid #bbb;
-    width: 100%;
-    padding: 10px;
-    height: auto;
-    margin-bottom:15px;
 }
 
 .hide{

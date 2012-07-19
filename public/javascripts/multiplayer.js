@@ -41,8 +41,22 @@ socket.on('answerResult', function(data){
   });
 });
 
+socket.on('start', function(data){
+    $('#start').addClass("hide");
+    $('#information').removeClass("hide");
+    $("#buzzer").removeClass("hide");
+    $("#skip").removeClass("hide");
+});
+
+socket.on('lockout', function(data){
+  clearTimeout(reading);
+});
+
 socket.on('theBuzzer', function(data){
-  console.log('theBuzzer recieved' + data);
+    clearTimeout(reading);
+    $("#answerDiv").removeClass("hide");
+    $('#skip').addClass("hide");
+    $("#buzzer").addClass("hide");
 });
 
 // General Announcements
@@ -93,26 +107,20 @@ $(document).ready(function(){
   // Buzzer
   $("#buzzer").click(function(event){
     socket.emit('buzzed', aUser);
-    clearTimeout(reading);
-    $("#answerDiv").removeClass("hide");
-    $('#skip').addClass("hide");
-    $("#buzzer").addClass("hide");
   });
 
   // Start the question
   $('#start').click(function(event){
     socket.emit('question', questNum);
-    $('#start').addClass("hide");
-    $('#information').removeClass("hide");
-    $("#buzzer").removeClass("hide");
-    $("#skip").removeClass("hide");
   });
 });
 
 
 
 function message (from, msg) {
-  $('#lines').append($('<p>').append($('<b>').text(from), msg));
+  if(msg.length > 0){
+    $('#lines').append($('<p>').append($('<b>').text(from + ": "), msg));
+  }
 }
 
 function clear () {

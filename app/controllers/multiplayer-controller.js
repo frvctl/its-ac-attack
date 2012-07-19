@@ -118,6 +118,7 @@ module.exports = function(app){
     socket.on('question', function(questNum){
       getNextQuestionAndCheckAnswer(null, questNum, 'History', function(question){
         socket.quesNum = questNum;
+        io.sockets.emit('start', question);
         io.sockets.emit('currentQuestion',  question);
       });
     });
@@ -129,7 +130,9 @@ module.exports = function(app){
      * can be locked out
      */
     socket.on('buzzed', function(data){
-      socket.broadcast.emit('theBuzzer', data);
+      io.sockets.emit('announcement', data + ' pressed the buzzer');
+      socket.broadcast.emit('lockout', data);
+      socket.emit('theBuzzer', data);
     });
 
     /*
@@ -143,7 +146,11 @@ module.exports = function(app){
       });
     });
 
-
+    /*
+     * Handles disconnection by deleting the disconnected user from the users object
+     * and telling all other clients that the user disconnected while also sending
+     * the new users object to all clients.
+     */
     socket.on('disconnect', function () {
        if (!socket.name) return;
        delete users[socket.name];
@@ -164,7 +171,7 @@ module.exports = function(app){
 
   /*
    * Handles the multiplayer view rendering and some session based user authoriz
-   * ation.
+   * ation that is accessed through request(req).
    */
   app.get('/multiplayer/:nextQuestion', mid.assignUserName, function(req, res){
     var ques = req.params;
