@@ -39,7 +39,7 @@ intend to implement are as follows:
           <li><del> Twitter </del></li>
           <li><del> Facebook </del></li>
         </ul>
-      <li> Standard Login </li>
+      <li><del> Standard Login </del></li>
       <li><del> Session Handling and Controll </del></li>
     </ul>
     <li><del>Get all of the views and routes working properly </del></li> 
