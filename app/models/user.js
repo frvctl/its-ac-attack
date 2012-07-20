@@ -54,9 +54,8 @@ UserSchema.plugin(mongooseAuth, {
     }
   },
   password: {
-    loginWith: 'email',
     extraParams: {
-      phone: String,
+      email: String,
       name: {
         first: String,
         last: String
