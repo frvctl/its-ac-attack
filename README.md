@@ -29,40 +29,31 @@ intend to implement are as follows:
     </ul>
   </ul>
 
-## Todo List:
+## Order of Importance:
 
-<ul>
-  <li><del> Establish an effective user authorization system <del></li>
-    <ul>
-      <li><del> Through Social Websites <del></li>
-        <ul>
-          <li><del> Twitter </del></li>
-          <li><del> Facebook </del></li>
-        </ul>
-      <li><del> Standard Login </del></li>
-      <li><del> Session Handling and Controll </del></li>
-    </ul>
-    <li><del>Get all of the views and routes working properly </del></li> 
-    <li><del>Get the JSON of questions from Kevin and work on the search function</del></li>
-    <li><del> Create a suitable chat application as a standalone application using Socket.io, Express, and Node </del></li> 
-    <li><del>Figure out what I am going to use for a server and how to go about setting that up and using it</del></li>
-    <li>Core Features</li>
-      <ul>
-          <li><del> Implement the Search Functionality </del></li>
-            <ul>
-              <li><del> Make the multiple pages work </del></li>
-              <li> Add a lot better styling </li>
-            </ul>
-          <li> Implement the Practice Functionality </li>
-            <ul>
-              <li><del> "Read" out the questions </del></li>
-              <li><del> Check the Answer </del></li>
-              <li> Pick where the questions are coming from </li>
-            </ul>
-          <li> Implement multiplayer Mode </li>
-            <ul>
-              <li><del> Login is dependant on this being successfull <del></li>
-              <li> Buzzer with timer, after buzz person is locked out </li>
-          <li><del> Implement the chat <del></li>
-      </ul>
-</ul>
+* Functionality
+* Speed and Efficiency
+* Usability
+* Design or Aesthetics
+
+## Rough Timeline for Version 1 Completion
+
+Version 1 implies that all features that I deemed important in the overview
+will be implemented and the overall app will be fast, usable, and aesthetically
+pleasing also it will be generally bug-free.
+
+* Todays Date: July 20, 2012
+* Task: Goal Finish Date
+  * Total Functionality Completed: July 30, 2012
+  * Rewrite to CoffeeScript: August 2, 2012
+  * Optimization, Testing, Bug-Squashing: August 5, 2012
+  * Redesign of the whole app: August 20, 2012
+
+## Todo:
+
+* Flash Messages
+* Time Sync Between Clients
+* Channels for multiple game rooms
+* Game modes
+* Profile page
+  * Settings 
