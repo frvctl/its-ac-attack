@@ -84,7 +84,7 @@ module.exports = function(app){
   });
 
   io.sockets.on('connection', function (socket) {
-    
+
    /*
     * On a user message - as in when the chat form submits - emit to everyone except
     * the client who sent the message the name of the person sending the message
@@ -110,6 +110,7 @@ module.exports = function(app){
         io.sockets.emit('names', users);
       }
     });
+
     /*
      * On a question - as in when the start question button is pressed - the current
      * question is fetched from the server using the getNextQuestion.. method and
@@ -122,7 +123,7 @@ module.exports = function(app){
         io.sockets.emit('currentQuestion',  question);
       });
     });
-
+    
     /*
      * Listens for when a user hits the buzzer, at which point we send who hit
      * the button back to the client side so that all other users can be
