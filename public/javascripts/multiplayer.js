@@ -1,6 +1,5 @@
 var socket = io.connect();
 var aUser = document.getElementById("userName").value;
-var questNum;
 var readSpeed = 1000*60/500;
 
 
@@ -24,7 +23,7 @@ socket.on('currentQuestion', function(data){
   function nextWord(){
     $("#question").text(words.slice(0, ++pointer).join(" "));
     $("<span>").css("visibility", "hidden").text(words.slice(pointer).join(" ")).appendTo("#question");
-    setTimeout(nextWord, readSpeed);
+    reader = setTimeout(nextWord, readSpeed);
   }
   nextWord();
 });
@@ -85,6 +84,8 @@ socket.on('error', function (e) {
 });
 
 $(document).ready(function(){
+  var counter = 0;
+
   // Send messages
   $('#send-message').submit(function () {
     message('me', $('#message').val());
@@ -107,14 +108,17 @@ $(document).ready(function(){
     socket.emit('buzzed', aUser);
   });
 
-  // Start the question
-  $('#start').click(function(event){
-    socket.emit('question', questNum);
-  });
+  // // Start the question
+  // $('#start').click(function(event){
+  //   socket.emit('question', questNum);
+  // });
 
-  $('#next').click(function(event){
-    socket.emit('next', true);
-  });
+  // $('#next').click(function(event){
+  //   clearTimeout(reader);
+  //   counter++;
+  //   socket.emit('question', questNum+counter);
+  //   $('#next').addClass('hide');
+  // });
 });
 
 

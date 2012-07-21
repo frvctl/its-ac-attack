@@ -1,0 +1,10 @@
+#aDiv
+  p Some Text
+
+#randomlyPlacedUserInfoDivThatIsExcessivlyLong
+  each attribute in userJson
+    li= attribute.login
+    li= attribute.email
+    li= attribute.name.first 
+      != " "
+      != attribute.name.last

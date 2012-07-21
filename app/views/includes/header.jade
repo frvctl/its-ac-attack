@@ -15,7 +15,7 @@ div.navbar.navbar-fixed-top
           li
             a(href='/practice/0') Practice
           li
-            a(href='/multiplayer/0') Multiplayer
+            a(href='/multiplayer') Multiplayer
           li.dropdown
             a(href='#', data-toggle="dropdown").dropdown-toggle User 
               b.caret
@@ -29,6 +29,8 @@ div.navbar.navbar-fixed-top
               li.divider
               li
                 a(href='/profile/' + (locals.userName || '')) Profile
+
+!= messages()
 
      script 
        $('.dropdown-toggle').dropdown() 

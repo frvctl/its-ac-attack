@@ -9,7 +9,7 @@ exports.assignUserName = function (req, res, next){
         req.userName = req.session.auth.twitter.user.name;
         next();
       }else if(req.session.auth.password){
-        req.userName = everyauth.password.email;
+        req.userName = req.session;
         next();
       }else if(req.session.auth.facebook){
         req.userName = req.session.auth.facebook.user.name;

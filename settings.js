@@ -92,7 +92,9 @@ function bootApplication(app) {
 
     slogan : function(req,res) {
       return 'an app';
-    }
+    },
+
+    messages: require('express-messages')
 
   });
 
