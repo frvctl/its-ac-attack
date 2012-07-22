@@ -1,8 +1,6 @@
 var Question = mongoose.model('Question'),
-    User = mongoose.model('User');
-    Chat = mongoose.model('Chat'),
-    mid = require('../../middleware.js');
-
+    Chat = mongoose.model('Chat');
+    
 /* ------------------------------------------------------------------------------ *\
  * Overview:                                                                      *
  * ===========                                                                    *
@@ -171,21 +169,14 @@ module.exports = function(app){
   });
   
 
-  app.get('/multiplayer', mid.assignUserName, function(req, res){
+  app.get('/multiplayer', mid.userInformation, function(req, res){
     if(req.loggedIn){
-      console.log(req.session.auth.userId);
-      User.find({_id:req.session.auth.userId}, function(err, userJson){
-        console.log(userJson);
       res.render('multiplayer/multiplayer-selectRoom', {
-        title: 'Select Room',
-        userJson: userJson,
-        userName: req.userName
+        title: 'Select Room'
       });
-    });
     }else{
       res.render('users/notAuthorized', {
-        title: 'Select Room',
-        userName: req.userName
+        title: 'Select Room'
       });
       }
     });
@@ -194,12 +185,11 @@ module.exports = function(app){
    * Handles the multiplayer view rendering and some session based user authoriz
    * ation that is accessed through request(req).
    */
-  app.get('/multiplayer/:channel', mid.assignUserName, function(req, res){
+  app.get('/multiplayer/:channel', function(req, res){
     if(req.loggedIn){
       res.render('multiplayer/multiplayer-practice', {
         title: 'Multiplayer',
-        loggedIn: req.session.auth,
-        userName: req.userName
+        loggedIn: req.session.auth
         });
     }else{
       req.flash("info", "You are not authorized");
