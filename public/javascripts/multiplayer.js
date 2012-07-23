@@ -1,7 +1,6 @@
 var socket = io.connect();
 var aUser = document.getElementById("userName").value;
-var questNum = document.getElementById("questionNumber").value;
-var reading;
+var readSpeed = 1000*60/500;
 
 
 socket.on('connect', function () {
@@ -24,36 +23,33 @@ socket.on('currentQuestion', function(data){
   function nextWord(){
     $("#question").text(words.slice(0, ++pointer).join(" "));
     $("<span>").css("visibility", "hidden").text(words.slice(pointer).join(" ")).appendTo("#question");
-    reading = setTimeout(nextWord, 1000*60/500);
+    reader = setTimeout(nextWord, readSpeed);
   }
   nextWord();
 });
 
 socket.on('answerResult', function(data){
-  $(document).ready(function(){
-    if(data){
-      $('#answer').text('Your answer is correct!');
-      $("#question").text(data[0].question);
-    }else{
-      $('#answer').text('Your answer is incorrect =(');
-      nextWord();
-    }
-  });
+  if(data){
+    $('#answer').text('Your answer is correct!');
+    $("#question").text(data[0].question);
+  }else{
+    $('#answer').text('Your answer is incorrect =(');
+  }
 });
 
 socket.on('start', function(data){
-    $('#start').addClass("hide");
-    $('#information').removeClass("hide");
-    $("#buzzer").removeClass("hide");
-    $("#skip").removeClass("hide");
+  $('#start').addClass("hide");
+  $('#information').removeClass("hide");
+  $("#buzzer").removeClass("hide");
+  $("#skip").removeClass("hide");
 });
 
+
 socket.on('lockout', function(data){
-  clearTimeout(reading);
+
 });
 
 socket.on('theBuzzer', function(data){
-    clearTimeout(reading);
     $("#answerDiv").removeClass("hide");
     $('#skip').addClass("hide");
     $("#buzzer").addClass("hide");
@@ -73,6 +69,7 @@ socket.on('names', function (names) {
 });
 
 socket.on('user message', message);
+
 socket.on('reconnect', function () {
   $('#lines').remove();
   message('System', 'Reconnected to the server');
@@ -87,6 +84,8 @@ socket.on('error', function (e) {
 });
 
 $(document).ready(function(){
+  var counter = 0;
+
   // Send messages
   $('#send-message').submit(function () {
     message('me', $('#message').val());
@@ -101,7 +100,7 @@ $(document).ready(function(){
     event.preventDefault();
     socket.emit('answer', $('#answerInput').val());
     $('#answerDiv').addClass("hide");
-    $('#nextQuestionButton').removeClass("hide");
+    $('#next').removeClass("hide");
   });
 
   // Buzzer
@@ -109,10 +108,17 @@ $(document).ready(function(){
     socket.emit('buzzed', aUser);
   });
 
-  // Start the question
-  $('#start').click(function(event){
-    socket.emit('question', questNum);
-  });
+  // // Start the question
+  // $('#start').click(function(event){
+  //   socket.emit('question', questNum);
+  // });
+
+  // $('#next').click(function(event){
+  //   clearTimeout(reader);
+  //   counter++;
+  //   socket.emit('question', questNum+counter);
+  //   $('#next').addClass('hide');
+  // });
 });
 
 

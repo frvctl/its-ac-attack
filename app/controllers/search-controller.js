@@ -1,12 +1,11 @@
-var Question = mongoose.model('Question'),
-    mid = require('../../middleware.js');
+var Question = mongoose.model('Question');
 
 module.exports = function(app){
   app.param('searchNext', function(req, res, next){
     next();
   });
 
-  app.get('/search/:searchNext', mid.assignUserName, function(req, res){
+  app.get('/search/:searchNext', function(req, res){
     var searchIndx = req.query.searchInput;
     var pg = req.params;
     var pgNum = parseInt(pg.searchNext, 10);
@@ -29,8 +28,7 @@ module.exports = function(app){
                   lesserIndx: (pgNum*10),
                   greaterIndx: (pgNum*10)+10,
                   questions: questions,
-                  searchIndx: searchIndx,
-                  userName: req.userName
+                  searchIndx: searchIndx
             });
           })
         );
@@ -41,8 +39,7 @@ module.exports = function(app){
         counter: pgNum,
         lesserIndx: (pgNum*10),
         greaterIndx: (pgNum*10)+10,
-        searchIndx:searchIndx,
-        userName: req.userName
+        searchIndx:searchIndx
       });
     }
   });

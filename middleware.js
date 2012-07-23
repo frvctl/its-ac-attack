@@ -1,24 +1,24 @@
+User = mongoose.model('User');
 
 /*
  *  Generic require login routing middleware
  */
 
-exports.assignUserName = function (req, res, next){
-    if(req.loggedIn){
-      if(req.session.auth.twitter){
-        req.userName = req.session.auth.twitter.user.name;
-        next();
-      }else if(req.session.auth.password){
-        req.userName = everyauth.password.email;
-        next();
-      }else if(req.session.auth.facebook){
-        req.userName = req.session.auth.facebook.user.name;
-        next();
-      }else{
-        next();
-      }
-    }else{
-      req.userName = 'None';
+exports.userInformation = function (req, res, next){
+  function getUserInfo(userInfo, callback){
+    User.find({_id:userInfo}, function(err, userJson){
+      callback(userJson);
+    });
+  }
+  if(req.loggedIn){
+    getUserInfo(req.session.auth.userId, function(userInfo){
+      req.userInfo = userInfo[0];
+      req.userName = userInfo[0].name.first + " " + userInfo[0].name.last;
       next();
-    }
-  };
+    });
+  }else{
+    req.userInfo = 'No User';
+    req.userName = 'None';
+    next();
+  }
+};

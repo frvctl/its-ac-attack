@@ -1,5 +1,4 @@
-var Question = mongoose.model('Question'),
-    mid = require('../../middleware.js');
+var Question = mongoose.model('Question');
 
 module.exports = function(app){
 
@@ -7,7 +6,7 @@ module.exports = function(app){
     next();
   });
 
-  app.get('/practice/:nextQuestion', mid.assignUserName, function(req, res){
+  app.get('/practice/:nextQuestion', function(req, res){
     var searchIndx = 'History';
     var userAnswer = req.query.answerInput;
     var ansIsTrue = false;

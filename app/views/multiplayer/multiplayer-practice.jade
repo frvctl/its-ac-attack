@@ -28,14 +28,13 @@ if(loggedIn)
         input(type='text', autocomplete="off", name='answerInput', placeholder='Answer')#answerInput.input-xlarge.search-query
       button(type='submit')#answerButton.btn.btn-primary Answer
   
-  input(type='hidden', value=counter)#questionNumber
   input(type='hidden', value=userName)#userName
 
   div#buttons.center
     button#start.btn.btn-primary.btn-large Start the Question!
     button#buzzer.hide.btn.btn-primary.btn-large Buzzer!
     button#skip.hide.btn.btn-primary.btn-large Skip this Question
-    a(href='/multiplayer/' + (counter+1) + '?answerInput=')#nextQuestionButton.btn.btn-primary.hide Next Question!
+    button#next.hide.btn.btn-primary Next Question
 
   hr
 

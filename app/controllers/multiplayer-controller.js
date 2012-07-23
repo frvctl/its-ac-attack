@@ -1,7 +1,7 @@
 var Question = mongoose.model('Question'),
-    Chat = mongoose.model('Chat'),
-    mid = require('../../middleware.js');
-
+    mid = require('../../middleware.js'),
+    Chat = mongoose.model('Chat');
+    
 /* ------------------------------------------------------------------------------ *\
  * Overview:                                                                      *
  * ===========                                                                    *
@@ -62,7 +62,8 @@ function getNextQuestionAndCheckAnswer(userAnswer, numToSkip, searchIndx, callba
 
 module.exports = function(app){
   var io = require('socket.io').listen(app),
-      users = {};
+      users = {},
+      channelState = {};
   
   /*
    * Configures socket.io for different Node.js enviromental variables. Production
@@ -84,7 +85,8 @@ module.exports = function(app){
   });
 
   io.sockets.on('connection', function (socket) {
-    
+    socket.questNum = 0;
+
    /*
     * On a user message - as in when the chat form submits - emit to everyone except
     * the client who sent the message the name of the person sending the message
@@ -110,6 +112,7 @@ module.exports = function(app){
         io.sockets.emit('names', users);
       }
     });
+
     /*
      * On a question - as in when the start question button is pressed - the current
      * question is fetched from the server using the getNextQuestion.. method and
@@ -122,7 +125,7 @@ module.exports = function(app){
         io.sockets.emit('currentQuestion',  question);
       });
     });
-
+    
     /*
      * Listens for when a user hits the buzzer, at which point we send who hit
      * the button back to the client side so that all other users can be
@@ -159,39 +162,39 @@ module.exports = function(app){
     });
   });
   
-  /*
-   * the nextQuestion param allows for the current question to be determined and
-   * therefore provides an easy way to know both on the client and server side
-   * which question is being handled. The param will the questions id within the
-   * database.
-   */
-  app.param('nextQuestion', function(req, res, next){
+ /*
+  * Write a comment here
+  */
+  app.param('channel', function(req, res, next){
     next();
   });
+  
+
+  app.get('/multiplayer', function(req, res){
+    if(req.loggedIn){
+      res.render('multiplayer/multiplayer-selectRoom', {
+        title: 'Select Room'
+      });
+    }else{
+      res.render('users/notAuthorized', {
+        title: 'Select Room'
+      });
+      }
+    });
 
   /*
    * Handles the multiplayer view rendering and some session based user authoriz
    * ation that is accessed through request(req).
    */
-  app.get('/multiplayer/:nextQuestion', mid.assignUserName, function(req, res){
-    var ques = req.params;
-    var quesNum = parseInt(ques.nextQuestion, 10);
+  app.get('/multiplayer/:channel', mid.userInformation, function(req, res){
     if(req.loggedIn){
       res.render('multiplayer/multiplayer-practice', {
         title: 'Multiplayer',
-        counter: quesNum,
         loggedIn: req.session.auth,
-        userName: req.userName,
-        nextQuestion: req.params.nextQuestion
+        userName: req.userName
         });
     }else{
-      res.render('multiplayer/multiplayer-practice', {
-        title: 'Multiplayer',
-        counter: quesNum,
-        loggedIn: req.session.auth,
-        userName: req.userName,
-        nextQuestion: req.params.nextQuestion
-      });
-     }
+      req.flash("info", "You are not authorized");
+      res.redirect('/login');     }
    });
 };
