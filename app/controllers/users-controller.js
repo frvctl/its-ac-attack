@@ -20,27 +20,14 @@ module.exports = function (app) {
   });
 
   app.param('profileId', function (req, res, next) {
-    // if(req.loggedIn){
-    //   if(req.session.auth.twitter){
-    //     user = req.session.auth.twitter.user.name;
-    //   }else{
-    //     user = req.session.auth.facebook.user.name;
-    //   }
-    // }else{
-    //   user = 'None';
-    // }
-    user = req.session.auth.twitter.user.name;
-    req.foundUser = user;
     next();
   });
     
   // Profile view
-  app.get('/profile/:profileId', function (req, res) {
-    var user = req.foundUser;
-    console.log(req.foundUser);
+  app.get('/profile/:profileId', mid.userInformation, function (req, res) {
     res.render('users/profile', {
-        title : 'Profile',
-        user : req.foundUser,
+        title: 'Profile',
+        user: req.userInfo,
         userName: req.userName
     });
   });

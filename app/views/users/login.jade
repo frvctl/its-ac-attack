@@ -2,7 +2,7 @@
   ul#errors
     - each error in errors
       li.error= error
-form(action='/login', method='POST').center
+form(action='/login', method='POST').left
   #login
     label(for=everyauth.password.loginFormFieldName) Login:
     input(type='text', name=everyauth.password.loginFormFieldName, value=login)
@@ -11,10 +11,3 @@ form(action='/login', method='POST').center
     input(type='password', name=everyauth.password.passwordFormFieldName)
   #submit
     input(type='submit').btn.btn-primary Login
-
-form.form-inline.center
-  a(href='/auth/facebook')
-    img(src='/images/facebook.png') 
-
-  a(href='/auth/twitter')
-    img(src='/images/twitter.png') 

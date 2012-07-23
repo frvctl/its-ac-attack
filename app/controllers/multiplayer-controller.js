@@ -1,4 +1,5 @@
 var Question = mongoose.model('Question'),
+    mid = require('../../middleware.js'),
     Chat = mongoose.model('Chat');
     
 /* ------------------------------------------------------------------------------ *\
@@ -169,7 +170,7 @@ module.exports = function(app){
   });
   
 
-  app.get('/multiplayer', mid.userInformation, function(req, res){
+  app.get('/multiplayer', function(req, res){
     if(req.loggedIn){
       res.render('multiplayer/multiplayer-selectRoom', {
         title: 'Select Room'
@@ -185,11 +186,12 @@ module.exports = function(app){
    * Handles the multiplayer view rendering and some session based user authoriz
    * ation that is accessed through request(req).
    */
-  app.get('/multiplayer/:channel', function(req, res){
+  app.get('/multiplayer/:channel', mid.userInformation, function(req, res){
     if(req.loggedIn){
       res.render('multiplayer/multiplayer-practice', {
         title: 'Multiplayer',
-        loggedIn: req.session.auth
+        loggedIn: req.session.auth,
+        userName: req.userName
         });
     }else{
       req.flash("info", "You are not authorized");
