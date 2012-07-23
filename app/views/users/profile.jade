@@ -1,3 +1,16 @@
-li= "Name: " + userName
-li= "Email: " + user.email
-li= "Username: " + user.login
+if(loggedIn)
+  li= "Name: " + userName
+  li= "Email: " + user.email
+  li= "Username: " + user.login
+
+
+if(!loggedIn)
+  p You are required to have an account in order to have a profile page
+   |  please 
+   a(href='/login') login
+   |  or if you do not yet have an account
+   a(href='/signup') signup 
+   |  for a free one!
+
+  p Having an account will give you access to multiplayer and allow you to gain full functionality of
+    |  the application

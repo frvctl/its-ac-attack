@@ -19,14 +19,11 @@ module.exports = function (app) {
     });
   });
 
-  app.param('profileId', function (req, res, next) {
-    next();
-  });
-    
   // Profile view
-  app.get('/profile/:profileId', mid.userInformation, function (req, res) {
+  app.get('/profile', mid.userInformation, function (req, res) {
     res.render('users/profile', {
         title: 'Profile',
+        loggedIn: req.loggedIn,
         user: req.userInfo,
         userName: req.userName
     });

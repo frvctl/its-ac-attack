@@ -1,5 +1,4 @@
 var exports = module.exports = everyauth = require('everyauth'),
-    Promise = everyauth.Promise,
     UserSchema = new Schema({}),
     User;
 
