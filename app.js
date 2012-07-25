@@ -5,6 +5,8 @@ var express = require('express'),
     fs = require('fs'),
     utils = require('./lib/utils');
 
+require('coffee-script');
+
 // Load configurations
 var config_file = require('yaml-config'),
 exports = module.exports = config = config_file.readConfig('config/config.yaml');
