@@ -2,24 +2,21 @@ var mid = require('../../middleware.js');
 
 module.exports = function(app){
   
-  app.get('/home', mid.userInformation, function(req, res){
+  app.get('/home', function(req, res){
     res.render('static_pages/home', {
-      title: 'Home',
-      userName: req.userName
+      title: 'Home'
     });
   });
 
-  app.get('/contact', mid.userInformation, function(req, res){
+  app.get('/contact', function(req, res){
     res.render('static_pages/contact', {
-      title: 'Contact',
-      userName: req.userName
+      title: 'Contact'
     });
   });
 
-  app.get('/help', mid.userInformation, function(req, res){
+  app.get('/help', function(req, res){
     res.render('static_pages/help', {
-      title: 'Help',
-      userName: req.userName
+      title: 'Help'
     });
   });
 

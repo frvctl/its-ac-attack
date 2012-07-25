@@ -1,12 +1,27 @@
-var socket = io.connect();
 var aUser = document.getElementById("userName").value;
+var channel = document.getElementById("channel").value;
+var socket = io.connect('http://localhost:3000');
+console.log('channel ' + channel);
 var readSpeed = 1000*60/500;
+
+/*
+ * Currently:
+ * ---------------------------------------------------------------------------
+ * On connect -> emit user information
+ * On currentQuestion -> Read the question out. Question is sent from the server
+ * On answerResult -> Display whether the answer is correct or not
+ * On start -> Change the display(pure jQuery)
+ * On lockout -> Nothing~~~
+ * On theBuzzer -> Change the displayer(pure jQuery)
+ * On <chatFunction> -> Chat stuff
+ */
 
 
 socket.on('connect', function () {
   $('#chat').addClass('connected');
   $('#connecting').addClass('hide');
   socket.emit('user', aUser);
+  socket.emit('join room', channel);
   clear();
   $('#chat').addClass('nickname-set');
 });
@@ -108,17 +123,17 @@ $(document).ready(function(){
     socket.emit('buzzed', aUser);
   });
 
-  // // Start the question
-  // $('#start').click(function(event){
-  //   socket.emit('question', questNum);
-  // });
+  // Start the question
+  $('#start').click(function(event){
+    socket.emit('question', questNum);
+  });
 
-  // $('#next').click(function(event){
-  //   clearTimeout(reader);
-  //   counter++;
-  //   socket.emit('question', questNum+counter);
-  //   $('#next').addClass('hide');
-  // });
+  $('#next').click(function(event){
+    clearTimeout(reader);
+    counter++;
+    socket.emit('question', questNum+counter);
+    $('#next').addClass('hide');
+  });
 });
 
 

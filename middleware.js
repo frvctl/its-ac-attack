@@ -1,5 +1,6 @@
 User = mongoose.model('User');
 
+
 /*
  *  Generic require login routing middleware
  */

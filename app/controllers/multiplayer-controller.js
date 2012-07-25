@@ -1,31 +1,32 @@
 var Question = mongoose.model('Question'),
     mid = require('../../middleware.js'),
     Chat = mongoose.model('Chat');
-    
-/* ------------------------------------------------------------------------------ *\
- * Overview:                                                                      *
- * ===========                                                                    *
- * This function is responsible for fetching the question information from the    *
- * server and allowing it to be sent to the client. The secondary purpose of      *
- * this function is checking answers and returning either true or false, if the   *
- * first argument is defined. The numToSkip argument allows the next question     *
- * to be accessed. The searchIndx argument allows questions from a different      *
- * search to be accessed.                                                         *
- * -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-  *
- * Arguments:                                                                     *
- * ============                                                                   *
- * userAnswer -> Accepts a string only, used to check the submitted answer and    *
- *               return either true - the answer is true - or false - the answer  *
- *               is false                                                         *
- * numToSkip -> Must be an integer, simply the number of questions from the first *
- *              that will be skipped over, see the mongodb docs for more info on  *
- *              how this works                                                    *
- * searchIndx -> Must be a string, the search method used to retrieve quesitons   *
- * callback -> A generic call back to get the information, will either return a   *
- *             question - callback(question) - or a boolean that represents the   *
- *             truth of an answer.                                                *
-\* ------------------------------------------------------------------------------ */
-function getNextQuestionAndCheckAnswer(userAnswer, numToSkip, searchIndx, callback){
+
+ /* -----------------get *NextQuestion* And *CheckAnswer* Function---------------- *\
+ |* Overview:                                                                      *|
+ |* ===========                                                                    *|
+ |* This function is responsible for fetching the question information from the    *|
+ |* server and allowing it to be sent to the client. The secondary purpose of      *|
+ |* this function is checking answers and returning either true or false, if the   *|
+ |* first argument is defined. The numToSkip argument allows the next question     *|
+ |* to be accessed. The searchIndx argument allows questions from a different      *|
+ |* search to be accessed.                                                         *|
+ |* -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-  *|
+ |* Arguments:                                                                     *|
+ |* ============                                                                   *|
+ |* userAnswer -> Accepts a string only, used to check the submitted answer and    *|
+ |*               return either true - the answer is true - or false - the answer  *|
+ |*               is false                                                         *|
+ |* numToSkip -> Must be an integer, simply the number of questions from the first *|
+ |*              that will be skipped over, see the mongodb docs for more info on  *|
+ |*              how this works                                                    *|
+ |* searchIndx -> Must be a string, the search method used to retrieve quesitons   *|
+ |* callback -> A generic call back to get the information, will either return a   *|
+ |*             question - callback(question) - or a boolean that represents the   *|
+ |*             truth of an answer.                                                *|
+ \* ------------------------------------------------------------------------------ */
+
+function getNQAndCA(userAnswer, numToSkip, searchIndx, callback){
   if(searchIndx){                          // RegEx provides for partial searching
     Question.find({$or :                   // $or is similar to logical ||
       [ {category: {$regex: searchIndx}},  // Searches by categories
@@ -59,11 +60,11 @@ function getNextQuestionAndCheckAnswer(userAnswer, numToSkip, searchIndx, callba
     });
   }
 }
-
+  
 module.exports = function(app){
   var io = require('socket.io').listen(app),
       users = {},
-      channelState = {};
+      channels = {};
   
   /*
    * Configures socket.io for different Node.js enviromental variables. Production
@@ -87,13 +88,18 @@ module.exports = function(app){
   io.sockets.on('connection', function (socket) {
     socket.questNum = 0;
 
+    socket.on('join room', function(room){
+      socket.join(room);
+      socket.room = room;
+    });
+
    /*
     * On a user message - as in when the chat form submits - emit to everyone except
     * the client who sent the message the name of the person sending the message
     * and the message content.
     */
     socket.on('user message', function (msg) {
-       socket.broadcast.emit('user message', socket.name, msg);
+       socket.broadcast.to(socket.room).emit('user message', socket.name, msg);
     });
    
     /*
@@ -105,11 +111,11 @@ module.exports = function(app){
      */
     socket.on('user', function(name){
       if(users[name]){
-        socket.emit('names', users);
+        socket.in(socket.room).emit('names', users);
       }else{
         users[name] = socket.name = name;
-        socket.broadcast.emit('announcement', name + ' connected');
-        io.sockets.emit('names', users);
+        socket.broadcast.to(socket.room).emit('announcement', name + ' connected');
+        io.sockets.in(socket.room).emit('names', users);
       }
     });
 
@@ -119,10 +125,10 @@ module.exports = function(app){
      * it is then emited to every client.
      */
     socket.on('question', function(questNum){
-      getNextQuestionAndCheckAnswer(null, questNum, 'History', function(question){
+      getNQAndCA(null, questNum, 'History', function(question){
         socket.quesNum = questNum;
-        io.sockets.emit('start', question);
-        io.sockets.emit('currentQuestion',  question);
+        io.sockets.in(socket.room).emit('start', question);
+        io.sockets.in(socket.room).emit('currentQuestion',  question);
       });
     });
     
@@ -144,7 +150,7 @@ module.exports = function(app){
      */
     socket.on('answer', function(data){
       console.log(socket.quesNum);
-      getNextQuestionAndCheckAnswer(data, socket.quesNum, 'History', function(theTruth){
+      getNQAndCA(data, socket.quesNum, 'History', function(theTruth){
         socket.emit('answerResult', theTruth);
       });
     });
@@ -157,8 +163,8 @@ module.exports = function(app){
     socket.on('disconnect', function () {
        if (!socket.name) return;
        delete users[socket.name];
-       socket.broadcast.emit('announcement', socket.name + ' disconnected');
-       io.sockets.emit('names', users);
+       socket.broadcast.to(socket.room).emit('announcement', socket.name + ' disconnected');
+       io.sockets.in(socket.room).emit('names', users);
     });
   });
   
@@ -188,8 +194,10 @@ module.exports = function(app){
    */
   app.get('/multiplayer/:channel', mid.userInformation, function(req, res){
     if(req.loggedIn){
+      var theChannel = req.params;
       res.render('multiplayer/multiplayer-practice', {
         title: 'Multiplayer',
+        channel: theChannel.channel,
         loggedIn: req.session.auth,
         userName: req.userName
         });

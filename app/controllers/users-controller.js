@@ -4,18 +4,16 @@ var User = mongoose.model('User'),
 module.exports = function (app) {
 
   // Handles Sign-up
-  app.get('/signup', mid.userInformation, function(req, res){
+  app.get('/signup', function(req, res){
     res.render('users/signup', {
-      title: 'Sign Up',
-      userName: req.userName
+      title: 'Sign Up'
     });
   });
 
   // Handles Session Login
-  app.get('/login', mid.userInformation, function(req, res){
+  app.get('/login', function(req, res){
     res.render('users/login', {
-      title: 'Login',
-      userName: req.userName
+      title: 'Login'
     });
   });
 

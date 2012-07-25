@@ -1,10 +1,8 @@
-#aDiv
-  p Some Text
+h1= Select a Room
 
-#randomlyPlacedUserInfoDivThatIsExcessivlyLong
-  each attribute in userJson
-    li= attribute.login
-    li= attribute.email
-    li= attribute.name.first 
-      != " "
-      != attribute.name.last
+#roomSelect
+  ul
+    li
+      a(href='/multiplayer/channel1') Test Channel 1
+    li
+      a(href='/multiplayer/channel2') Test Channel 2
