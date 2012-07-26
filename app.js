@@ -2,8 +2,7 @@
 | * Configuration loading and booting of controllers and custom error handlers */
 
 var express = require('express'),
-    fs = require('fs'),
-    utils = require('./lib/utils');
+    fs = require('fs');
 
 require('coffee-script');
 
