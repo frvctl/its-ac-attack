@@ -9,48 +9,40 @@ module.exports = (app) ->
     pg = req.params
     pgNum = parseInt(pg.searchNext, 10)
     nPerPage = 10
+    numToSkip = 1
     if searchIndx
       Question.find
         $or: [
-          category:
-            $regex: searchIndx
-        ,
-          answer:
-            $regex: searchIndx
-        ,
-          difficulty:
-            $regex: searchIndx
-        ,
-          tournament:
-            $regex: searchIndx
-        ,
-          year:
-            $type: 18
-         ],
-         (
+          (category: $regex: searchIndx)
+        , (answer: $regex: searchIndx)
+        , (difficulty: $regex: searchIndx)
+        , (tournament: $regex: searchIndx)
+        , (year: $type: 18)
+        ],(
           category: 1
           answer: 1
           difficulty: 1
           question: 1
           year: 1
           tournament: 1
-         )
-         (
-          skip: pgNum * 10
-          limit: nPerPage
-         )
-       (err, questions) ->
-         res.render "questions/search",
+        ),(
+          skip: numToSkip
+          limit: 1
+        ),((err, question) -> 
+         res.render "question/search",
            title: "Search"
            counter: pgNum
            lesserIndx: (pgNum * 10)
            greaterIndx: (pgNum * 10) + 10
-           questions: questions
+           question: question
            searchIndx: searchIndx
-      res.render "questions/search",
+        )
+    else
+      res.render "question/search",
         title: "Search"
-        questions: []
+        question: []
         counter: pgNum
         lesserIndx: (pgNum * 10)
         greaterIndx: (pgNum * 10) + 10
         searchIndx: searchIndx
+  
