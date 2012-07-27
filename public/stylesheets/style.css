@@ -7,6 +7,7 @@ html{
 body {
     padding-top: 60px;
     padding-bottom: 40px;
+    font-family: sans-serif;
 }
 
 .center{
@@ -29,6 +30,56 @@ body {
     visibility: visible;
 }
 
+#guess {
+    width: 400px;
+    border-style: solid;
+    border-width: 1px;
+    font-size: 32px;
+    margin-left: 20px;
+}
+
+a#new {
+    text-decoration: none
+}
+#unread {
+    visibility: hidden;
+}
+#name, .title {
+    display: inline;
+}
+#question {
+    margin-left: 40px;
+}
+.unselectable {
+    -webkit-user-select: none;
+    user-select: none;
+    -moz-user-select: none;
+    cursor: default;
+}
+.warning {
+    font-style: italic;
+}
+hr {
+    border-style: solid;
+    border-top-width: 0;
+}
+
+#countdown, #reveal {
+    font-size: 32px;
+    font-family: monospace;
+}
+#countdown {
+    font-weight: bold;
+    color: red;
+}
+#reveal {
+    float: right;
+}
+
+#answer {
+    text-align: right;
+    font-style: italic;
+}
 
 .navbar .divider-vertical {margin: 0}
 .navbar .nav > li > a {padding: 10px 23px 11px 20px;}
