@@ -9,6 +9,17 @@ module.exports = (app) ->
   damlev = require('../../public/javascripts/levenshtein').levenshtein
   syllables = require('../../public/javascripts/syllable').syllables
   
+  io.configure 'development', () ->
+    io.set 'log level', 2
+
+  io.configure 'production', () ->
+    io.enable 'browser client minification'
+    io.enable 'browser client etag'
+    io.disable 'browser client gzip'
+    io.set 'transports', ["xhr-polling"]
+    io.set 'polling duration', 10
+    io.set 'log level', 1
+
   questions = []
 
   fs.readFile 'questions.txt', 'utf8', (err, data) ->
