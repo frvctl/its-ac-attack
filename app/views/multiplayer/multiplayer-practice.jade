@@ -1,60 +1,157 @@
-if(loggedIn)
-  p.right
-    != 'You are logged in as: '
-    != userName
+script
+  channel_name = '!{name}'
+div.container
+  div.row
+    div.span9
+      div.row(style="margin-bottom: 10px")
+        div.span9
+          div.form-horizontal
+            div.actionbar
+              button.btn.chatbtn(title="Shortcut: / key", rel='tooltip', disabled)
+                i.icon-comment
+                | Chat
+              | 
+              button.btn.btn-info.skipbtn(title="Shortcut: s key", rel='tooltip', disabled)
+                | Skip
+              | 
+              button.btn.btn-warning.pausebtn(title="Shortcut: p key", rel='tooltip', disabled) 
+                | Pause
+              | 
+              button.btn.pull-right.btn-danger.buzzbtn(title="Shortcut: space key", rel='tooltip', disabled)
+                i.icon-bell.icon-white
+                | Buzz
+            form.expando.chat_form(style="display:none")
+              div.input-prepend
+                span.add-on
+                  i.icon-comment
+                  | Chat
+                input.chat_input(type='text', placeholder='chat message')
+            form.expando.guess_form(style="display:none")
+              div.input-prepend
+                span.add-on
+                  i.icon-pencil
+                  | Guess
+                input.guess_input(type='text', placeholder='answer')  
 
-  div.row-fluid
-    ul
-      form#information.well.hide
-        li(type="none")
-          != 'Difficulty: '
-          span#difficulty
-          != ' | '
-          != 'Year: '
-          span#year
-          != ' | '
-          != 'Category: '
-          span#category
-          != ' | '
-          != 'Tournament: '
-          span#tournament
-          hr    
-          span#question
-      span#answer
+      div#history
+    div.span3
+      // this part really doesn't matter
+      // so it's perfectly logical to stick
+      // it here so it'll be inaccessible in mobile
 
-  div#answerDiv.hide
-    form(name="answerForm", action="", method="get")#answerForm.center.well.search-form
-      div
-        input(type='text', autocomplete="off", name='answerInput', placeholder='Answer')#answerInput.input-xlarge.search-query
-      button(type='submit')#answerButton.btn.btn-primary Answer
-  
-  input(type='hidden', value=userName)#userName
-  input(type='hidden', value=channel)#channel
+      div.span3.thumbnail
+        h5 
+          i.icon-time
+          | Timer 
+          span.label.label-warning.pause(style="display:none") Paused
+          span.label.label-important.buzz(style="display:none") Buzz
+        div.timer.unselectable
+          span.face 00:00
+          span.fraction .0
 
-  div#buttons.center
-    button#start.btn.btn-primary.btn-large Start the Question!
-    button#buzzer.hide.btn.btn-primary.btn-large Buzzer!
-    button#skip.hide.btn.btn-primary.btn-large Skip this Question
-    button#next.hide.btn.btn-primary Next Question
+        div.progress.progress-striped
+          div.bar(style="width:0%")
+      div.span3.thumbnail.leaderboard
+        table.table
+          thead
+            tr
+              th #
+              th Name
+              th Interrupts
+          tbody
 
-  hr
 
-  #chat
-    p.hide#nickname-err This is already in use
-    #connecting
-      .wrap Connecting to socket.io server
-    form#messages
-      #nicknames
-      #lines
-    form#send-message
-      input(placeholder='Write a message...')#message
 
-if(!loggedIn)
-  p.center
-    != 'You are not logged in, to use multiplayer please '
-    a(href='/login') login
-    != ' or if you do not have an account '
-    a(href='/signup') signup
+      div.span3.thumbnail
+        h5
+          i.icon-wrench
+          | Settings
 
-script(src="/socket.io/socket.io.js")
-script(src='../../javascripts/multiplayer.js')
+        div(style="text-align: center; padding-right: 4px; padding-left: 4px; padding-top: 4px")
+          div.expando
+            div.input-prepend
+              span.add-on
+                i.icon-user
+              input#username(type='text', value='flame monkey')
+          //- button.btn(data-toggle="button") 
+          //-   i.icon-bell
+          //-   | Sound
+          // span.badge(style="margin-left: 10px") 42
+
+      div.span3.thumbnail.show-keyboard
+        h5 
+          i.icon-info-sign
+          | Tips
+        ul
+          li Press <code>s</code> to begin
+          li Press <code>space</code> to buzz
+          li Press <code>/</code> to chat
+          li Change settings by hacking the code
+          li Make up tips and don't do anything about them
+
+      div.span3.thumbnail.show-touch
+        h5 
+          i.icon-info-sign
+          | Tips
+        ul
+          li Buttons are fun to press
+
+      div.span3.thumbnail
+          h5 
+            i.icon-fire
+            | Debugging
+          table.table-condensed.table
+            thead
+              tr
+                th attr
+                th val
+            tbody
+              tr
+                td latency
+                td#latency ?
+              tr
+                td sync_offset
+                td#sync_offset ? 
+
+
+div.modal.hide#disco
+  div.modal-header
+    button.close(type="button", data-dismiss="modal") ×
+    h3 YOU GOT DISCONNECTED
+  div.modal-body
+    p Sorry, try reloading.
+    p 
+      | Also, I don't think this is the most user friendly possible
+      | modal disconnection alert window, but fixing that issue is
+      | the problem of future me, or of someone else. 
+  div.modal-footer
+    a.btn(href="#", data-dismiss="modal") Close
+    a.btn.btn-primary(href="") Reload
+
+div.modal.hide#about
+  div.modal-header
+    button.close(type="button", data-dismiss="modal") ×
+    h3 About
+  div.modal-body
+    p I really don't have the slightest clue what to say here.
+    p 
+      | But this was concieved some time towards the end of the school year of 2012
+      | and was implemented mostly within a week's time intermittently, and this is
+      | actually the second prototype. The name actually comes as a contraction or
+      | portmanteau of "Prototype" and "QuizBowl", with the word "Application" cleverly
+      | ommitted for no reason in particular. 
+
+    p
+      | It's something made with Twitter Bootstrap,
+      | which I'm trying to disguise best I can by replacing that cliche black header bar
+      | with something considerably lighter. Also, it uses jQuery (largely because Bootstrap
+      | really likes jQuery, but I guess I really like jQuery too). Modernizr, but only for
+      | one function which is sort of lame. Most of the code is actually written in CoffeeScript
+      | which is pretty cool. It uses node.js, socket.io, express, jade and less (via 
+      | less-middleware).
+  div.modal-footer
+    a.btn(href="https://github.com/antimatter15/protobowl/tree/rewrite", target="_blank") GitHub
+    a.btn.btn-primary(href="#", data-dismiss="modal") Close
+
+
+script(src="../../javascripts/multiplayer.js")

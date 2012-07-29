@@ -3573,6 +3573,7 @@ input[type="submit"].btn.btn-mini {
   *z-index: 2;
   margin-bottom: 18px;
   overflow: visible;
+  color: #555;
 }
 
 .navbar-inner {

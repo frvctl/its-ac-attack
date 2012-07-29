@@ -1,5 +1,28 @@
 Question = mongoose.model("Question")
 
+getNextQuestion: (numToSkip, searchIndx, callback) ->
+  if searchIndx
+    Question.find
+      $or: [
+          (category: $regex: searchIndx)
+        , (answer: $regex: searchIndx)
+        , (difficulty: $regex: searchIndx)
+        , (tournament: $regex: searchIndx)
+        , (year: $type: 18)
+        ],(
+          category: 1
+          answer: 1
+          difficulty: 1
+          question: 1
+          year: 1
+          tournament: 1
+        ),(
+          skip: numToSkip
+          limit: 1
+        ),((err, question) -> 
+          callback question
+        )
+        
 module.exports = (app) ->
   app.param "nextQuestion", (req, res, next) ->
     next()
