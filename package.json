@@ -1,7 +1,7 @@
 {
   "name": "ProtoBowl",
   "description": "A trivia database for question answering practice",
-  "version": "2.2.0-4",
+  "version": "2.2.0-6",
   "private": false,
   "author": "Epiccodez (http://github.com/epiccodez)",
   "engines": {
