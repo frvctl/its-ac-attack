@@ -5,9 +5,9 @@ Chat = mongoose.model("Chat")
 module.exports = (app) ->
   io = require('socket.io').listen(app)
   fs = require('fs')
-  checkAnswer = require('../../public/javascripts/answerparse').checkAnswer
-  damlev = require('../../public/javascripts/levenshtein').levenshtein
-  syllables = require('../../public/javascripts/syllable').syllables
+  checkAnswer = require('../../public/javascripts/answer/answerparse').checkAnswer
+  damlev = require('../../public/javascripts/answer/levenshtein').levenshtein
+  syllables = require('../../public/javascripts/answer/syllable').syllables
   
   io.configure 'development', () ->
     io.set 'log level', 2
@@ -25,7 +25,6 @@ module.exports = (app) ->
   fs.readFile 'questions.txt', 'utf8', (err, data) ->
     throw err if err
     questions = (JSON.parse(line) for line in data.split("\n"))
-    # questions = [{question: "to galvanization to galvanization to galvanization to galvanization to galvanization to galvanization to galvanization"}]
 
   cumsum = (list, rate) ->
     sum = 0
@@ -51,7 +50,6 @@ module.exports = (app) ->
 
     unfreeze: ->
       if @time_freeze
-        # @time_offset = new Date - @time_freeze
         @set_time @time_freeze
         @time_freeze = 0
 
@@ -59,7 +57,6 @@ module.exports = (app) ->
       @time_offset = new Date - ts
 
     pause: ->
-      #no point really because being in an attempt means being frozen
       @freeze() unless @attempt or @time() > @end_time
 
     unpause: ->
@@ -74,7 +71,6 @@ module.exports = (app) ->
         setTimeout =>
           @timeout(metric, time, callback)
         , diff
-
 
     new_question: ->
       @attempt = null
@@ -113,7 +109,6 @@ module.exports = (app) ->
       io.sockets.in(@name).emit name, data
 
     end_buzz: (session) ->
-      #killit, killitwithfire
       if @attempt?.session is session
         @attempt.final = true
         score = checkAnswer @attempt.text, @answer
@@ -125,7 +120,6 @@ module.exports = (app) ->
           @set_time @end_time
         @attempt = null #g'bye
         @sync() #two syncs in one request!
-
 
     buzz: (user, fn) ->
       if @attempt is null and @time() <= @end_time
@@ -177,10 +171,8 @@ module.exports = (app) ->
             actionvotes.push client.id
           else
             nay++
-        # console.log yay, 'yay', nay, 'nay', action
         if actionvotes.length > 0
           data.voting[action] = actionvotes
-        # console.log yay, nay, "VOTES FOR", action
         if yay / (yay + nay) > 0
           client.del(action) for client in io.sockets.clients(@name)
           this[action]()
@@ -260,9 +252,16 @@ module.exports = (app) ->
       n = list.split(',')
       n[Math.floor(n.length * Math.random())]
     console.log(req.params.channel)
-    res.redirect '/multiplayer/' + pick(people) + "-" + pick(verb) + "-" + pick(noun)
+    if req.loggedIn
+      res.redirect '/multiplayer/' + pick(people) + "-" + pick(verb) + "-" + pick(noun)
+    else
+      res.redirect '/notAuthorized'
 
-  app.get "/multiplayer/:channel", (req, res) ->
+  app.get "/multiplayer/:channel", mid.userInformation, (req, res) ->
     name = req.params.channel
-    # init_channel name
-    res.render 'multiplayer/multiplayer-practice', { name }
+    res.render 'multiplayer/multiplayer-practice', {
+      name,
+      loggedIn: req.loggedIn,
+      user: req.userInfo,
+      userName: req.userName 
+    }

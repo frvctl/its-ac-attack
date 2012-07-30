@@ -50,7 +50,7 @@ bootApplication = (app) ->
       req.session
 
     dateformat: (req, res) ->
-      require("./lib/dateformat").strftime
+      require("./public/javascripts/lib/dateformat").strftime
 
     base: ->
       (if "/" is app.route then "" else app.route)

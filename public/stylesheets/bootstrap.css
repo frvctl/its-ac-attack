@@ -11,7 +11,84 @@
 article,
 aside,
 details,
-figcaption,
+figcaption, .timer {
+        font-size: 250%;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      .timer .fraction {
+        font-size: 50%;
+      }
+      .timer.buzz {
+        color: #DA2F22;
+      }
+      .thumbnail {
+        margin: 0;
+        margin-bottom: 18px;
+        overflow: auto;
+      }
+      .thumbnail h5 i, .expando i, .actionbar i {
+        margin-right: 5px;
+        margin-top: 1px;
+      }
+      .expando i {
+        margin-left: 5px;
+      }
+      .actionbar .expando .add-on {
+        padding-right: 10px;
+      }
+      .breadcrumb {
+        overflow: auto;
+      }
+      .show-touch {
+        display: none;
+      }
+
+      div.textbar { display: none !important ;}
+      .text div.textbar { display: inherit !important; }
+      .text .actionbar { display: none !important; }
+
+      form.expando {
+        margin: 0;
+      }
+      .bundle .annotations .author {
+        font-weight: bold;
+      }
+      .bundle .annotations .typing {
+        opacity: 0.7;
+      }
+      .bundle .annotations .log {
+        font-style: italic;
+      }
+      .active .unread {
+        visibility: hidden;
+      }
+      .visible .buzzicon.label {
+        padding: 0;
+      }
+      .answer {
+        font-weight: bold;
+      }
+
+      .active .answer {
+        visibility: hidden;
+      }
+      .unselectable {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+      .progress .bar {
+        -webkit-transition: none;
+        -moz-transition: none;
+        -ms-transition: none;
+        -o-transition: none;
+        transition: none;
+      }​
+
+      .btn.disabled, .btn[disabled] {
+        opacity: 0.35;
+      }
 figure,
 footer,
 header,
@@ -1778,7 +1855,7 @@ table .span24 {
   *margin-right: .3em;
   line-height: 14px;
   vertical-align: text-top;
-  background-image: url("../img/glyphicons-halflings.png");
+  background-image: url("../images/glyphicons-halflings.png");
   background-position: 14px 14px;
   background-repeat: no-repeat;
 }
@@ -1789,7 +1866,7 @@ table .span24 {
 }
 
 .icon-white {
-  background-image: url("../img/glyphicons-halflings-white.png");
+  background-image: url("../images/glyphicons-halflings-white.png");
 }
 
 .icon-glass {

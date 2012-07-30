@@ -1,6 +1,6 @@
 Question = mongoose.model("Question")
 
-getNextQuestion: (numToSkip, searchIndx, callback) ->
+getNextQuestion = (numToSkip, searchIndx, callback) ->
   if searchIndx
     Question.find
       $or: [

@@ -35,9 +35,9 @@ div.container
 
       div#history
     div.span3
-      // this part really doesn't matter
-      // so it's perfectly logical to stick
-      // it here so it'll be inaccessible in mobile
+      //- // this part really doesn't matter
+      //- // so it's perfectly logical to stick
+      //- // it here so it'll be inaccessible in mobile
 
       div.span3.thumbnail
         h5 
@@ -60,12 +60,15 @@ div.container
               th Interrupts
           tbody
 
-
-
       div.span3.thumbnail
         h5
           i.icon-wrench
           | Settings
+          li= "Name: " + userName
+          li= "Email: " + user.email
+          li= "Username: " + user.login
+
+
 
         div(style="text-align: center; padding-right: 4px; padding-left: 4px; padding-top: 4px")
           div.expando
@@ -76,7 +79,7 @@ div.container
           //- button.btn(data-toggle="button") 
           //-   i.icon-bell
           //-   | Sound
-          // span.badge(style="margin-left: 10px") 42
+          //- span.badge(style="margin-left: 10px") 42
 
       div.span3.thumbnail.show-keyboard
         h5 
@@ -153,5 +156,5 @@ div.modal.hide#about
     a.btn(href="https://github.com/antimatter15/protobowl/tree/rewrite", target="_blank") GitHub
     a.btn.btn-primary(href="#", data-dismiss="modal") Close
 
-
-script(src="../../javascripts/multiplayer.js")
+script(src='/socket.io/socket.io.js')
+script(src="../../javascripts/multiplayer/multiplayer.js")

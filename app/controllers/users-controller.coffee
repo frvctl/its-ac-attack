@@ -10,6 +10,10 @@ module.exports = (app) ->
     res.render "users/login",
       title: "Login"
 
+  app.get "/notAuthorized", (req, res) ->
+    res.render "users/notAuthorized",
+    title: "You are not Authorized"
+
   app.get "/profile", mid.userInformation, (req, res) ->
     res.render "users/profile",
       title: "Profile"

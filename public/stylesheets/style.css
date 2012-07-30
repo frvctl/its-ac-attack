@@ -24,6 +24,12 @@ html{
     margin-right: 5px;
     margin-top: 1px;
 }
+.expando i {
+    margin-left: 5px;
+}
+.actionbar .expando .add-on {
+    padding-right: 10px;
+}
 .breadcrumb {
     overflow: auto;
 }
@@ -38,7 +44,6 @@ div.textbar { display: none !important ;}
 form.expando {
     margin: 0;
 }
-
 .bundle .annotations .author {
     font-weight: bold;
 }
@@ -50,6 +55,9 @@ form.expando {
 }
 .active .unread {
     visibility: hidden;
+}
+.visible .buzzicon.label {
+    padding: 0;
 }
 .answer {
     font-weight: bold;
@@ -74,7 +82,6 @@ form.expando {
 .btn.disabled, .btn[disabled] {
     opacity: 0.35;
 }
-
 
 body {
     padding-top: 60px;
