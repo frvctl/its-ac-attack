@@ -34,6 +34,7 @@ module.exports = (app) ->
   class QuizRoom
     constructor: (name) ->
       @name = name
+      @answer_duration = 1000 * 5
       @time_offset = 0
       @new_question()
       @attempt = null
@@ -50,6 +51,7 @@ module.exports = (app) ->
 
     unfreeze: ->
       if @time_freeze
+        # @time_offset = new Date - @time_freeze
         @set_time @time_freeze
         @time_freeze = 0
 
@@ -57,6 +59,7 @@ module.exports = (app) ->
       @time_offset = new Date - ts
 
     pause: ->
+      #no point really because being in an attempt means being frozen
       @freeze() unless @attempt or @time() > @end_time
 
     unpause: ->
@@ -72,10 +75,11 @@ module.exports = (app) ->
           @timeout(metric, time, callback)
         , diff
 
+
     new_question: ->
       @attempt = null
 
-      answer_time = 1000 * 5
+
       @begin_time = @time()
       question = questions[Math.floor(questions.length * Math.random())]
       @info = {
@@ -99,8 +103,8 @@ module.exports = (app) ->
       }
       {list, rate} = @timing
       cumulative = cumsum list, rate
-      @end_time = @begin_time + cumulative[cumulative.length - 1] + answer_time
-      @sync(true)
+      @end_time = @begin_time + cumulative[cumulative.length - 1] + @answer_duration
+      @sync(2)
 
     skip: ->
       @new_question()
@@ -109,20 +113,25 @@ module.exports = (app) ->
       io.sockets.in(@name).emit name, data
 
     end_buzz: (session) ->
+      #killit, killitwithfire
       if @attempt?.session is session
         @attempt.final = true
-        score = checkAnswer @attempt.text, @answer
-        @attempt.correct = (score < 2)
+        @attempt.correct = checkAnswer @attempt.text, @answer
 
         @sync()
         @unfreeze()
         if @attempt.correct
+          io.sockets.socket(@attempt.user).store.data.correct = (io.sockets.socket(@attempt.user).store.data.correct || 0) + 1
           @set_time @end_time
+        else if @attempt.interrupt
+          io.sockets.socket(@attempt.user).store.data.interrupts = (io.sockets.socket(@attempt.user).store.data.interrupts || 0) + 1
         @attempt = null #g'bye
-        @sync() #two syncs in one request!
+        @sync(1) #two syncs in one request!
+
 
     buzz: (user, fn) ->
       if @attempt is null and @time() <= @end_time
+        fn 'http://www.whosawesome.com/'
         session = Math.random().toString(36).slice(2)
         @attempt = {
           user: user,
@@ -131,11 +140,13 @@ module.exports = (app) ->
           duration: 8 * 1000,
           session, # generate 'em server side 
           text: '',
+          interrupt: @time() < @end_time - @answer_duration,
           final: false
         }
-        fn 'http://www.whosawesome.com/'
+        io.sockets.socket(user).store.data.guesses = (io.sockets.socket(user).store.data.guesses || 0) + 1
+
         @freeze()
-        @sync() #partial sync
+        @sync(1) #partial sync
         @timeout @serverTime, @attempt.realTime + @attempt.duration, =>
           @end_buzz session
       else
@@ -154,7 +165,7 @@ module.exports = (app) ->
         else
           @sync()
 
-    sync: (full) ->
+    sync: (level = 0) ->
       data = {
         real_time: +new Date,
         voting: {}
@@ -171,25 +182,35 @@ module.exports = (app) ->
             actionvotes.push client.id
           else
             nay++
+        # console.log yay, 'yay', nay, 'nay', action
         if actionvotes.length > 0
           data.voting[action] = actionvotes
+        # console.log yay, nay, "VOTES FOR", action
         if yay / (yay + nay) > 0
           client.del(action) for client in io.sockets.clients(@name)
           this[action]()
-      blacklist = ["name", "question", "answer", "timing", "voting"]
+      blacklist = ["name", "question", "answer", "timing", "voting", "info"]
       for attr of this when typeof this[attr] != 'function' and attr not in blacklist
         data[attr] = this[attr]
-      if full
-        data.question = @question
-        data.answer = @answer
-        data.timing = @timing
+      if level >= 1
         data.users = for client in io.sockets.clients(@name)
           {
             id: client.id,
-            name: client.store.data.name
+            name: client.store.data.name,
+            interrupts: client.store.data.interrupts || 0,
+            correct: client.store.data.correct || 0,
+            guesses: client.store.data.guesses || 0
           }
 
+      if level
+        data.question = @question
+        data.answer = @answer
+        data.timing = @timing
+        data.info = @info
+
       io.sockets.in(@name).emit 'sync', data
+
+
 
   rooms = {}
   io.sockets.on 'connection', (sock) ->
@@ -203,7 +224,7 @@ module.exports = (app) ->
       sock.join room_name
       rooms[room_name] = new QuizRoom(room_name) unless room_name of rooms
       room = rooms[room_name]
-      room.sync(true)
+      room.sync(2)
       room.emit 'introduce', {user: sock.id}
 
     sock.on 'echo', (data, callback) =>
@@ -211,7 +232,7 @@ module.exports = (app) ->
 
     sock.on 'rename', (name) ->
       sock.set 'name', name
-      room.sync(true) if room
+      room.sync(1) if room
 
     sock.on 'skip', (vote) ->
       sock.set 'skip', vote
@@ -226,13 +247,14 @@ module.exports = (app) ->
       room.sync() if room
 
     sock.on 'buzz', (data, fn) ->
-      room.buzz sock.id, fn
+      room.buzz(sock.id, fn) if room
 
     sock.on 'guess', (data) ->
-      room.guess sock.id, data
+      room.guess(sock.id, data)  if room
 
     sock.on 'chat', ({text, final, session}) ->
-      room.emit 'chat', {text: text, session:  session, user: sock.id, final: final}
+      if room
+        room.emit 'chat', {text: text, session:  session, user: sock.id, final: final}
 
     sock.on 'disconnect', ->
       id = sock.id
@@ -240,9 +262,10 @@ module.exports = (app) ->
       setTimeout ->
         console.log !!room, 'rooms'
         if room
-          room.sync(true)
+          room.sync(1)
           room.emit 'leave', {user: id}
       , 100
+
 
   app.get "/multiplayer", (req, res) ->
     people = 'kirk,feynman,huxley,robot,ben,batman,panda,pinkman,superhero,celebrity,traitor,alien,lemon,police,whale,astronaut'
@@ -259,9 +282,13 @@ module.exports = (app) ->
 
   app.get "/multiplayer/:channel", mid.userInformation, (req, res) ->
     name = req.params.channel
-    res.render 'multiplayer/multiplayer-practice', {
-      name,
-      loggedIn: req.loggedIn,
-      user: req.userInfo,
-      userName: req.userName 
-    }
+    if req.loggedIn
+      res.render 'multiplayer/multiplayer-practice', {
+        name,
+        loggedIn: req.loggedIn,
+        user: req.userInfo,
+        userName: req.userName 
+      }
+    else
+      res.render 'users/notAuthorized', 
+        title: 'Your are not Authorized'
