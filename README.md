@@ -29,31 +29,18 @@ intend to implement are as follows:
     </ul>
   </ul>
 
-## Order of Importance:
+## ToDo List
 
-* Functionality
-* Speed and Efficiency
-* Usability
-* Design or Aesthetics
+ * Full user integration into the current system
+ * Different game settings ie 2v2 or free for all
+ * Full gamification through a match search type feature
+ * Fully functional vote system for deciding on things
+ * Admin privalages for certain users
+ * Fix the ugly black navbar and general design improvements
+ * Single Player and Search functionality
 
-## Rough Timeline for Version 1 Completion
 
-Version 1 implies that all features that I deemed important in the overview
-will be implemented and the overall app will be fast, usable, and aesthetically
-pleasing also it will be generally bug-free.
 
-* Todays Date: July 20, 2012
-* Task: Goal Finish Date
-  * Total Functionality Completed: July 30, 2012
-  * Rewrite to CoffeeScript: August 2, 2012
-  * Optimization, Testing, Bug-Squashing: August 5, 2012
-  * Redesign of the whole app: August 20, 2012
+## The Steps Beyond
 
-## Todo:
-
-* Flash Messages
-* Time Sync Between Clients
-* Channels for multiple game rooms
-* Game modes
-* Profile page
-  * Settings 
+Ultimatly this app is a real time gamified collaborative information dissemination enviroment in short a possibilty for the future of learning. Gamification makes almost everything more fun and more accessible to a wider audience therefor a way to learn almost anything in a gamified question/answer format would be somewhat revolutionary for learning. The way to this future is by taking information from web pages, say wikipedia, parsing them into trivia type questions and then playing against their friends and learning along the way. Not only could this be a powerful and less painful way to learn but the possibilties for what subjects and what knowledge could be gained is nearly endless. Although this is a long way off from this apps current state it is something that inspires me to continue working on it and hopefully get to that point in the future. 
