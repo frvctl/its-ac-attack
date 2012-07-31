@@ -4,18 +4,7 @@ users = {}
 sync_offsets = []
 sync_offset = 0
 
-
-# $('html').toggleClass 'touchscreen', Modernizr.touch
-
-generateName = ->
-  adjective = 'flaming,aberrant,agressive,warty,hoary,breezy,dapper,edgy,feisty,gutsy,hardy,intrepid,jaunty,karmic,lucid,maverick,natty,oneric,precise,quantal,quizzical,curious,derisive,bodacious,nefarious,nuclear,nonchalant'
-  animal = 'monkey,axolotl,warthog,hedgehog,badger,drake,fawn,gibbon,heron,ibex,jackalope,koala,lynx,meerkat,narwhal,ocelot,penguin,quetzal,kodiak,cheetah,puma,jaguar,panther,tiger,leopard,lion,neanderthal,walrus,mushroom,dolphin'
-  pick = (list) -> 
-    n = list.split(',')
-    n[Math.floor(n.length * Math.random())]
-  pick(adjective) + " " + pick(animal)
-
-public_name = generateName()
+public_name = userName
 $('#username').val public_name
 $('#username').keydown (e) ->
   e.stopPropagation()
