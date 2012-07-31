@@ -31,6 +31,7 @@ module.exports = (app) ->
     for num in list
       sum += Math.round(num) * rate #always round!
 
+
   class QuizRoom
     constructor: (name) ->
       @name = name
@@ -202,7 +203,7 @@ module.exports = (app) ->
             guesses: client.store.data.guesses || 0
           }
 
-      if level
+      if level >= 2
         data.question = @question
         data.answer = @answer
         data.timing = @timing
@@ -265,7 +266,6 @@ module.exports = (app) ->
           room.sync(1)
           room.emit 'leave', {user: id}
       , 100
-
 
   app.get "/multiplayer", (req, res) ->
     people = 'kirk,feynman,huxley,robot,ben,batman,panda,pinkman,superhero,celebrity,traitor,alien,lemon,police,whale,astronaut'

@@ -101,7 +101,8 @@ sock.once 'connect', ->
   }
 
 
-sock.on 'sync', (data) ->
+synchronize = (data) ->
+  # console.log JSON.stringify(data)
   #here is the rather complicated code to calculate
   #then offsets of the time synchronization stuff
   #it's totally not necessary to do this, but whatever
@@ -130,6 +131,11 @@ sock.on 'sync', (data) ->
     $('#time_offset').text(sync.time_offset.toFixed(1))
 
 
+
+sock.on 'sync', (data) ->
+  synchronize(data)
+
+
 latency_log = []
 testLatency = ->
   initialTime = +new Date
@@ -147,7 +153,7 @@ testLatency = ->
 
 setTimeout ->
   testLatency()
-  setInterval testLatency, 60 * 1000
+  setInterval testLatency, 30 * 1000
 , 2500
 
 last_question = null
@@ -176,12 +182,14 @@ renderState = ->
     count = 0
     list.find('tr').addClass 'to_remove'
 
-    for user in sync.users.sort((a, b) -> computeScore(b) - computeScore(b))
+    for user in sync.users.sort((a, b) -> computeScore(b) - computeScore(a))
+      # console.log user.name, count
       $('.user-' + user.id).text(user.name)
       count++
       row = list.find '.sockid-' + user.id
+      list.append row     
       if row.length < 1
-        console.log 'recreating user'
+        # console.log 'recreating user'
         row = $('<tr>').appendTo list 
 
         row.popover {
@@ -225,6 +233,8 @@ renderState = ->
     # console.log users.join ', '
     # document.querySelector('#users').innerText = users.join(', ')
 
+  #fix all the expandos
+  $(window).resize()
   renderPartial()
 
 renderPartial = ->
@@ -235,15 +245,15 @@ renderPartial = ->
     changeQuestion() #whee slidey
     last_question = sync.question
   timeDelta = time() - sync.begin_time
-  words = sync.question.split ' '
+  words = sync.question.replace(/\s+/g, ' ').split ' '
   {list, rate} = sync.timing
   cumulative = cumsum list, rate
   index = 0
   index++ while timeDelta > cumulative[index]
   # index++ if timeDelta > cumulative[0]
   bundle = $('#history .bundle.active') #$('#history .bundle').first()
-  new_text = words.slice(0, index).join(' ')
-  old_text = bundle.find('.readout .visible').text().replace(/\s+/g, ' ')
+  new_text = words.slice(0, index).join(' ').trim()
+  old_text = bundle.find('.readout .visible').text().replace(/\s+/g, ' ').trim()
   #this more complicated system allows text selection
   #while it's still reading out stuff
   # for word in words.slice(0, index)
@@ -254,20 +264,59 @@ renderPartial = ->
     i - 1
 
   visible = bundle.find('.readout .visible')
+  unread = bundle.find('.readout .unread')
   old_spots = visible.data('spots') is spots.join(',')
   if new_text isnt old_text or !old_spots
     # console.log spots
-    if new_text.indexOf(old_text.trim()) is 0 and old_spots
-      bundle.find('.readout .visible').append(new_text.slice old_text.length)
-    else
-      # console.log 'redo'
-      visible.data('spots', spots.join(','))
-      visible.text ''
-      for i in [0...index]
-        visible.append(words[i] + " ")
-        if i in spots
-          # visible.append('<span class="label label-important">'+words[i]+'</span> ')
-          visible.append ' <span class="buzzicon label label-important"><i class="icon-white icon-bell"></i></span> '
+    # change = new_text.slice old_text.length
+    # console.log change
+    # if new_text.indexOf(old_text.trim()) is 0 and old_spots and change.indexOf('*') is -1
+    #   visible.append(change)
+    #   unread.text words.slice(index).join(' ')
+    # else
+    # console.log 'redo'
+    visible.data('spots', spots.join(','))
+
+    # textnodes = (node for node in visible[0].childNodes when node.textContent not in [' ', ''])
+    # console.log textnodes, words
+
+    # visible.contents().remove() # setting text to '' retains a blank textnode
+    unread.text ''
+    # console.log words[0], "RAWR"
+
+    # $(textnodes).slice(index).remove() #remove the later ones
+
+    children = visible.children()
+    children.slice(index).remove()
+
+    elements = []
+    for i in [0...words.length]
+      # console.log words[i]
+      element = $('<span>')
+      if words[i].indexOf('*') isnt -1
+        element.append " <span class='inline-icon label'><i class='icon-white icon-asterisk'>"+words[i]+"</i></span> "
+      else
+        element.append(words[i] + " ")
+
+      if i in spots
+        # element.append('<span class="label label-important">'+words[i]+'</span> ')
+        label_type = 'label-important'
+        if i is words.length - 1
+          label_type = "label-info"
+        element.append " <span class='inline-icon label #{label_type}'><i class='icon-white icon-bell'></i></span> "
+
+      elements.push element
+
+    for i in [0...words.length]
+      if i < index
+        unless children.eq(i).html() is elements[i].html()
+          # console.log 'removing'
+          children.slice(i).remove()
+          visible.append elements[i]
+
+      else
+        unread.append elements[i].contents()
+
 
 
   # if new_text isnt old_text
@@ -277,7 +326,7 @@ renderPartial = ->
   #     node.appendChild document.createTextNode(change)
   #   else
   #     bundle.find('.readout .visible').text new_text
-  bundle.find('.readout .unread').text words.slice(index).join(' ')
+  # bundle.find('.readout .unread').text words.slice(index).join(' ')
   #render the time
   renderTimer()
 
@@ -333,7 +382,8 @@ renderTimer = ->
 
 
   $('.progress').toggleClass 'progress-warning', !!(sync.time_freeze and !sync.attempt)
-  $('.progress').toggleClass 'progress-danger', !!sync.attempt
+  $('.progress').toggleClass 'active progress-danger', !!sync.attempt
+
 
 
 
@@ -344,8 +394,10 @@ renderTimer = ->
     $('.pausebtn, .buzzbtn').attr 'disabled', true
   else
     ms = sync.end_time - time()
-    progress = (time() - sync.begin_time)/(sync.end_time - sync.begin_time)
-    $('.pausebtn, .buzzbtn').attr 'disabled', (ms < 0)
+    elapsed = (time() - sync.begin_time)
+    progress = elapsed/(sync.end_time - sync.begin_time)
+    $('.pausebtn').attr 'disabled', (ms < 0)
+    $('.buzzbtn').attr 'disabled', (ms < 0 or elapsed < 100)
     if ms < 0
       $('.bundle.active').find('.answer').css('visibility', 'visible')
 
@@ -391,7 +443,11 @@ changeQuestion = ->
     bundle.width('auto')
     $(this).dequeue()
   if old.find('.readout').length > 0
-    old.find('.readout')[0].normalize() 
+    nested = old.find('.readout .visible>span')
+    old.find('.readout .visible').append nested.contents()
+    nested.remove()
+
+    old.find('.readout')[0].normalize()
 
     old.queue ->
       old.find('.readout').slideUp("slow")
@@ -434,14 +490,19 @@ addAnnotation = (el) ->
   return el
 
 
-guessAnnotation = ({session, text, user, final, correct}) ->
+guessAnnotation = ({session, text, user, final, correct, interrupt}) ->
   # TODO: make this less like chats
   id = user + '-' + session
   if $('#' + id).length > 0
     line = $('#' + id)
   else
     line = $('<p>').attr('id', id)
-    line.append $('<span>').addClass('label label-important').text("Buzz")
+    marker = $('<span>').addClass('label').text("Buzz")
+    if interrupt
+      marker.addClass 'label-important'
+    else
+      marker.addClass 'label-info'
+    line.append marker
     line.append " "
     line.append userSpan(user).addClass('author')
     line.append document.createTextNode ' '
@@ -460,7 +521,7 @@ guessAnnotation = ({session, text, user, final, correct}) ->
   else
     line.find('.comment').text(text)
   if final
-    ruling = line.find('.ruling').show()
+    ruling = line.find('.ruling').show().css('display', 'inline')
     if correct
       ruling.addClass('label-success').text('Correct')
     else
@@ -631,9 +692,15 @@ $(window).resize ->
     add = $(this).find('.add-on').outerWidth()
     size = $(this).width()
     outer = $(this).find('input').outerWidth() - $(this).find('input').width()
+    # console.log 'exp', add, outer, size
     $(this).find('input').width size - outer - add
 
 $(window).resize()
+
+#ugh, this is fugly, maybe i should have used calc
+setTimeout ->
+  $(window).resize()
+, 762 
 
 #display a tooltip for keyboard shortcuts on keyboard machines
 unless Modernizr.touch
