@@ -29,7 +29,7 @@ module.exports = (app) ->
           skip: numToSkip
           limit: 1
         ),((err, question) -> 
-         res.render "question/search",
+         res.render "search/search",
            title: "Search"
            counter: pgNum
            lesserIndx: (pgNum * 10)
@@ -38,7 +38,7 @@ module.exports = (app) ->
            searchIndx: searchIndx
         )
     else
-      res.render "question/search",
+      res.render "search/search",
         title: "Search"
         question: []
         counter: pgNum
