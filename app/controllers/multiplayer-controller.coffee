@@ -336,8 +336,10 @@ module.exports = (app) ->
     # console.log(req.params.channel)
     roomName = req.query.roomName
     if req.loggedIn and not roomName
-      res.render "multiplayer/multiplayer-selectRoom",
-        title: 'Select Room'
+      res.render "multiplayer/multiplayer-selectRoom", {
+        title: 'Select Room',
+        rooms: rooms
+      }
     else if req.loggedIn and roomName
       res.redirect '/multiplayer/' + roomName
     else
@@ -347,6 +349,7 @@ module.exports = (app) ->
     name = req.params.channel
     if req.loggedIn
       res.render 'multiplayer/multiplayer-practice', {
+        title: 'Multiplayer Practice'
         name,
         loggedIn: req.loggedIn,
         user: req.userInfo,

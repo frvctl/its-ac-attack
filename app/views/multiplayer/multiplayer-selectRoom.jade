@@ -9,7 +9,10 @@ h1 Select a Room
 
 #availableRoomList
   ul
-    li Rooms go here ~~
+    li Join a currently active room
+    each room in rooms
+      li 
+        a(href='/multiplayer/' + room.name)= room.name
 
 form(actions='', method='get')#makeroom
   #roomName

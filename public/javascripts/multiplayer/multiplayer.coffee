@@ -135,13 +135,6 @@ synchronize = (data) ->
   if sync.attempt
     if sync.attempt.user isnt public_id
       setActionMode '' if actionMode is 'guess'
-    # else
-    #   setActionMode 'guess' if actionMode isnt 'guess'
-
-  # if sync.time_offset isnt null
-  #   $('#time_offset').text(sync.time_offset.toFixed(1))
-
-
 
 sock.on 'sync', (data) ->
   synchronize(data)
