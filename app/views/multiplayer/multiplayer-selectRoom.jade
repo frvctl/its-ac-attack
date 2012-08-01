@@ -6,3 +6,12 @@ h1 Select a Room
       a(href='/multiplayer/channel1') Test Channel 1
     li(type='none')
       a(href='/multiplayer/channel2') Test Channel 2
+
+#availableRoomList
+  ul
+    li Rooms go here ~~
+
+form(actions='', method='get')#makeroom
+  #roomName
+    label Name of Room
+    input(type='text', name='roomName')

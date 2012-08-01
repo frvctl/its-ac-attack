@@ -327,15 +327,19 @@ module.exports = (app) ->
           room.emit 'leave', {user: publicID}
 
   app.get "/multiplayer", (req, res) ->
-    people = 'kirk,feynman,huxley,robot,ben,batman,panda,pinkman,superhero,celebrity,traitor,alien,lemon,police,whale,astronaut'
-    verb = 'on,enveloping,eating,drinking,in,near,sleeping,destruction,arresting,cloning,around,jumping,scrambling'
-    noun = 'mountain,drugs,house,asylum,elevator,scandal,planet,school,brick,lamp,water,paper,friend,toilet,airplane,cow,pony'
-    pick = (list) -> 
-      n = list.split(',')
-      n[Math.floor(n.length * Math.random())]
-    console.log(req.params.channel)
-    if req.loggedIn
-      res.redirect '/multiplayer/' + pick(people) + "-" + pick(verb) + "-" + pick(noun)
+    # people = 'kirk,feynman,huxley,robot,ben,batman,panda,pinkman,superhero,celebrity,traitor,alien,lemon,police,whale,astronaut'
+    # verb = 'on,enveloping,eating,drinking,in,near,sleeping,destruction,arresting,cloning,around,jumping,scrambling'
+    # noun = 'mountain,drugs,house,asylum,elevator,scandal,planet,school,brick,lamp,water,paper,friend,toilet,airplane,cow,pony'
+    # pick = (list) -> 
+    #   n = list.split(',')
+    #   n[Math.floor(n.length * Math.random())]
+    # console.log(req.params.channel)
+    roomName = req.query.roomName
+    if req.loggedIn and not roomName
+      res.render "multiplayer/multiplayer-selectRoom",
+        title: 'Select Room'
+    else if req.loggedIn and roomName
+      res.redirect '/multiplayer/' + roomName
     else
       res.redirect '/notAuthorized'
 
