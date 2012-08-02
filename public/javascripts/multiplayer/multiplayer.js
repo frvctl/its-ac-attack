@@ -319,7 +319,7 @@
   };
 
   renderPartial = function() {
-    var bundle, buzz, children, cumulative, del, element, elements, i, index, label_type, list, new_text, old_spots, old_text, rate, spots, timeDelta, unread, visible, words, _i, _j, _ref, _ref1, _ref2;
+    var bundle, buzz, children, cumulative, del, element, elements, i, index, label_type, new_text, old_spots, old_text, spots, timeDelta, unread, visible, words, _i, _j, _ref, _ref1;
     if (!(sync.question && sync.timing)) {
       return;
     }
@@ -332,8 +332,7 @@
     }
     timeDelta = time() - sync.begin_time;
     words = sync.question.replace(/\s+/g, ' ').split(' ');
-    _ref = sync.timing, list = _ref.list, rate = _ref.rate;
-    cumulative = cumsum(list, rate);
+    cumulative = cumsum(sync.timing, sync.rate);
     index = 0;
     while (timeDelta > cumulative[index]) {
       index++;
@@ -342,11 +341,11 @@
     new_text = words.slice(0, index).join(' ').trim();
     old_text = bundle.find('.readout .visible').text().replace(/\s+/g, ' ').trim();
     spots = (function() {
-      var _i, _len, _ref1, _results;
-      _ref1 = bundle.data('starts') || [];
+      var _i, _len, _ref, _results;
+      _ref = bundle.data('starts') || [];
       _results = [];
-      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-        buzz = _ref1[_i];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        buzz = _ref[_i];
         del = buzz - sync.begin_time;
         i = 0;
         while (del > cumulative[i]) {
@@ -365,10 +364,10 @@
       children = visible.children();
       children.slice(index).remove();
       elements = [];
-      for (i = _i = 0, _ref1 = words.length; 0 <= _ref1 ? _i < _ref1 : _i > _ref1; i = 0 <= _ref1 ? ++_i : --_i) {
+      for (i = _i = 0, _ref = words.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
         element = $('<span>');
         if (words[i].indexOf('*') !== -1) {
-          element.append(" <span class='inline-icon label'><span class='asterisk'>" + words[i] + "</span><i class='icon-white icon-asterisk'></i></span> ");
+          element.append(" <span class='inline-icon'><span class='asterisk'>" + words[i] + "</span><i class='label icon-white icon-asterisk'></i></span> ");
         } else {
           element.append(words[i] + " ");
         }
@@ -377,11 +376,11 @@
           if (i === words.length - 1) {
             label_type = "label-info";
           }
-          element.append(" <span class='inline-icon label " + label_type + "'><i class='icon-white icon-bell'></i></span> ");
+          element.append(" <span class='inline-icon'><i class='label icon-white icon-bell  " + label_type + "'></i></span> ");
         }
         elements.push(element);
       }
-      for (i = _j = 0, _ref2 = words.length; 0 <= _ref2 ? _j < _ref2 : _j > _ref2; i = 0 <= _ref2 ? ++_j : --_j) {
+      for (i = _j = 0, _ref1 = words.length; 0 <= _ref1 ? _j < _ref1 : _j > _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
         if (i < index) {
           if (children.eq(i).html() !== elements[i].html()) {
             children.slice(i).remove();
@@ -582,7 +581,7 @@
   };
 
   guessAnnotation = function(_arg) {
-    var correct, early, final, id, interrupt, line, marker, ruling, session, text, user;
+    var answer, correct, early, final, id, interrupt, line, marker, ruling, session, text, user;
     session = _arg.session, text = _arg.text, user = _arg.user, final = _arg.final, correct = _arg.correct, interrupt = _arg.interrupt, early = _arg.early;
     id = user + '-' + session;
     if ($('#' + id).length > 0) {
@@ -602,7 +601,7 @@
       line.append(userSpan(user).addClass('author'));
       line.append(document.createTextNode(' '));
       $('<span>').addClass('comment').appendTo(line);
-      ruling = $('<span>').addClass('label ruling').hide();
+      ruling = $('<a>').addClass('label ruling').hide().attr('href', '#');
       line.append(' ');
       line.append(ruling);
       addAnnotation(line);
@@ -623,6 +622,14 @@
       } else {
         ruling.addClass('label-warning').text('Wrong');
       }
+      answer = sync.answer;
+      ruling.click(function() {
+        $('#review .review-judgement').text(ruling.text());
+        $('#review .review-answer').text(answer);
+        $('#review .review-response').text(text);
+        $('#review').modal('show');
+        return false;
+      });
       if (actionMode === 'guess') {
         return setActionMode('');
       }
@@ -686,10 +693,11 @@
 
   setActionMode = function(mode) {
     actionMode = mode;
-    $('.guess_input, .chat_input').blur();
+    $('.prompt_input, .guess_input, .chat_input').blur();
     $('.actionbar').toggle(mode === '');
     $('.chat_form').toggle(mode === 'chat');
     $('.guess_form').toggle(mode === 'guess');
+    $('.prompt_form').toggle(mode === 'prompt');
     return $(window).resize();
   };
 
@@ -772,6 +780,25 @@
     return setActionMode('');
   });
 
+  $('.prompt_input').keyup(function(e) {
+    if (e.keyCode === 13) {
+      return;
+    }
+    return sock.emit('prompt', {
+      text: $('.prompt_input').val(),
+      final: false
+    });
+  });
+
+  $('.prompt_form').submit(function(e) {
+    sock.emit('prompt', {
+      text: $('.prompt_input').val(),
+      final: true
+    });
+    e.preventDefault();
+    return setActionMode('');
+  });
+
   $('body').keydown(function(e) {
     var _ref, _ref1, _ref2;
     if (actionMode === 'chat') {
@@ -785,7 +812,11 @@
     }
     if (e.keyCode === 32) {
       e.preventDefault();
-      $('.buzzbtn').click();
+      if ($('.bundle .start-page').length === 1) {
+        $('.pausebtn').click();
+      } else {
+        $('.buzzbtn').click();
+      }
     } else if ((_ref = e.keyCode) === 83 || _ref === 78 || _ref === 74) {
       $('.skipbtn').click();
     } else if ((_ref1 = e.keyCode) === 80 || _ref1 === 82) {

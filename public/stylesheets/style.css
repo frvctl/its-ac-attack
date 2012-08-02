@@ -19,6 +19,15 @@ html{
   margin-bottom: 18px;
   overflow: auto;
 }
+.thumbnail .table {
+  margin-bottom: 5px;
+}
+.thumbnail .table.headless tbody tr:first-child td {
+  border-top: none;
+}
+.thumbnail .progress {
+  margin-bottom: 9px;
+}
 .thumbnail h5 i,
 .expando i,
 .actionbar i {
@@ -52,6 +61,7 @@ form.expando {
 .bundle .bookmark {
   margin-left: 5px;
   text-decoration: none;
+  font-size: 125%;
 }
 .bundle .answer {
   font-weight: bold;
@@ -59,18 +69,26 @@ form.expando {
 .bundle .start-page {
   text-align: center;
 }
-.bundle .inline-icon.label {
+.bundle .inline-icon {
+  text-shadow: none;
+}
+.bundle .inline-icon .label {
   padding-top: 0;
   padding-bottom: 0;
-  padding-left: 2px;
-  padding-right: 2px;
-  text-shadow: none;
+  padding-left: 3px;
+  padding-right: 3px;
+  display: inline-block;
 }
 .bundle .asterisk {
   width: 0px;
   color: transparent;
   display: inline-block;
   text-shadow: none;
+}
+#review .review-response,
+#review .review-judgement,
+#review .review-answer {
+  font-style: italic;
 }
 .bundle.active .answer {
   visibility: hidden;
@@ -106,77 +124,6 @@ body {
     padding-top: 70px;
     padding-bottom: 40px;
     font-family: sans-serif;
-}
-
-.center{
-    text-align: center;
-}
-
-.right{
-    text-align: right;
-}
-
-.left{
-    text-align: left;
-}
-
-.hidden{
-    visibility: hidden;
-}
-
-.visible{
-    visibility: visible;
-}
-
-#guess {
-    width: 400px;
-    border-style: solid;
-    border-width: 1px;
-    font-size: 32px;
-    margin-left: 20px;
-}
-
-a#new {
-    text-decoration: none
-}
-#unread {
-    visibility: hidden;
-}
-#name, .title {
-    display: inline;
-}
-#question {
-    margin-left: 40px;
-}
-.unselectable {
-    -webkit-user-select: none;
-    user-select: none;
-    -moz-user-select: none;
-    cursor: default;
-}
-.warning {
-    font-style: italic;
-}
-hr {
-    border-style: solid;
-    border-top-width: 0;
-}
-
-#countdown, #reveal {
-    font-size: 32px;
-    font-family: monospace;
-}
-#countdown {
-    font-weight: bold;
-    color: red;
-}
-#reveal {
-    float: right;
-}
-
-#answer {
-    text-align: right;
-    font-style: italic;
 }
 
 .navbar .divider-vertical {margin: 0}

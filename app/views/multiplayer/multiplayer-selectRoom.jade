@@ -1,20 +1,33 @@
 h1 Select a Room
 
-#roomSelect
-  ul
-    li(type='none')
-      a(href='/multiplayer/channel1') Test Channel 1
-    li(type='none')
-      a(href='/multiplayer/channel2') Test Channel 2
+p Join an already occupied room with your friends or create your own
 
-#availableRoomList
-  ul
-    li Join a currently active room
-    each room in rooms
-      li 
-        a(href='/multiplayer/' + room.name)= room.name
+hr
+
+#roomTable
+  table.table
+    thead
+      tr
+        th Channel Name
+        th Number of Users
+        th Game Mode
+        th Difficulty
+    tbody
+      each room, i in rooms
+        - console.log(Object.keys(room.users).length)
+        tr
+          td 
+            a(href='/multiplayer/' + room.name)= room.name
+          td= Object.keys(room.users).length 
+          td Not yet made
+          td Not yet made
+hr
 
 form(actions='', method='get')#makeroom
   #roomName
+    p Create your Own Room
     label Name of Room
     input(type='text', name='roomName')
+  div.btn.btn-primary Make Private
+
+script(src='../../javascripts/multiplayer/lobby.js')

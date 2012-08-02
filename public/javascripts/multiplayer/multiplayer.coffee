@@ -4,8 +4,6 @@ users = {}
 sync_offsets = []
 sync_offset = 0
 
-# $('html').toggleClass 'touchscreen', Modernizr.touch
-
 jQuery.fn.disable = (value) ->
   current = $(this).attr('disabled') is 'disabled'
   if current != value
@@ -135,6 +133,13 @@ synchronize = (data) ->
   if sync.attempt
     if sync.attempt.user isnt public_id
       setActionMode '' if actionMode is 'guess'
+    # else
+    #   setActionMode 'guess' if actionMode isnt 'guess'
+
+  # if sync.time_offset isnt null
+  #   $('#time_offset').text(sync.time_offset.toFixed(1))
+
+
 
 sock.on 'sync', (data) ->
   synchronize(data)
@@ -229,13 +234,6 @@ renderState = ->
           $('.leaderboard tbody tr').not(this).popover 'hide'
           $(this).popover 'toggle'
 
-        # row.mouseover (e) ->
-        #   $('.leaderboard tbody tr').not(this).popover 'hide'
-        #   if $(this).data('popover'),$(this).data('popover').tip().hasClass('out')
-        #     $(this).popover 'show'
-        # row.mouseout (e) ->
-        #   console.log $(this).data('popover'),$(this).data('popover').tip().hasClass('in')
-        #   # $(this).popover 'hide'
       row.attr 'data-original-title', "<span class='user-#{user.id}'>#{user.name}</span>'s stats"
       row.attr 'data-content', "User ID: #{user.id.slice(0, 16)}\n
                     Last Seen: #{formatTime(user.last_action)}\n
@@ -265,16 +263,10 @@ renderState = ->
 
       $('<td>').text(count).append('&nbsp;').append(badge).appendTo row
       name = $('<td>').text(user.name)
-      # if public_id is user.id
-      #   name.append " "
-      #   name.append $('<span>').addClass('label').text('me')
       name.appendTo row
       $('<td>').text(user.interrupts).appendTo row
-      # $('<td>').text(7).appendTo row
 
     list.find('tr.to_remove').remove()
-    # console.log users.join ', '
-    # document.querySelector('#users').innerText = users.join(', ')
   if sync.users.length > 0
     $('.leaderboard').slideDown()
 
@@ -296,111 +288,67 @@ renderPartial = ->
 
   timeDelta = time() - sync.begin_time
   words = sync.question.replace(/\s+/g, ' ').split ' '
-  {list, rate} = sync.timing
-  cumulative = cumsum list, rate
+  cumulative = cumsum sync.timing, sync.rate
   index = 0
   index++ while timeDelta > cumulative[index]
-  # index++ if timeDelta > rate
 
   bundle = $('#history .bundle.active') #$('#history .bundle').first()
   new_text = words.slice(0, index).join(' ').trim()
   old_text = bundle.find('.readout .visible').text().replace(/\s+/g, ' ').trim()
   #this more complicated system allows text selection
   #while it's still reading out stuff
-  # for word in words.slice(0, index)
   spots = for buzz in (bundle.data('starts') || [])
     del = buzz - sync.begin_time
     i = 0
     i++ while del > cumulative[i]
     i - 1
 
-  # console.log "BUZES", spots, words.length
-
   visible = bundle.find('.readout .visible')
   unread = bundle.find('.readout .unread')
   old_spots = visible.data('spots') is spots.join(',')
   if new_text isnt old_text or !old_spots
-    # console.log spots
-    # change = new_text.slice old_text.length
-    # console.log change
-    # if new_text.indexOf(old_text.trim()) is 0 and old_spots and change.indexOf('*') is -1
-    #   visible.append(change)
-    #   unread.text words.slice(index).join(' ')
-    # else
-    # console.log 'redo'
     visible.data('spots', spots.join(','))
-
-    # textnodes = (node for node in visible[0].childNodes when node.textContent not in [' ', ''])
-    # console.log textnodes, words
-
-    # visible.contents().remove() # setting text to '' retains a blank textnode
     unread.text ''
-    # console.log words[0], "RAWR"
-
-    # $(textnodes).slice(index).remove() #remove the later ones
-
     children = visible.children()
     children.slice(index).remove()
 
     elements = []
     for i in [0...words.length]
-      # console.log words[i]
       element = $('<span>')
       if words[i].indexOf('*') isnt -1
-        element.append " <span class='inline-icon label'><span class='asterisk'>"+words[i]+"</span><i class='icon-white icon-asterisk'></i></span> "
+        element.append " <span class='inline-icon'><span class='asterisk'>"+words[i]+"</span><i class='label icon-white icon-asterisk'></i></span> "
       else
         element.append(words[i] + " ")
 
       if i in spots
-        # element.append('<span class="label label-important">'+words[i]+'</span> ')
         label_type = 'label-important'
-        # console.log spots, i, words.length
         if i is words.length - 1
           label_type = "label-info"
-        element.append " <span class='inline-icon label #{label_type}'><i class='icon-white icon-bell'></i></span> "
+        element.append " <span class='inline-icon'><i class='label icon-white icon-bell  #{label_type}'></i></span> "
 
       elements.push element
 
     for i in [0...words.length]
       if i < index
         unless children.eq(i).html() is elements[i].html()
-          # console.log 'removing'
           children.slice(i).remove()
           visible.append elements[i]
 
       else
         unread.append elements[i].contents()
 
-
-
-  # if new_text isnt old_text
-  #   if new_text.indexOf(old_text) is 0
-  #     node = bundle.find('.readout .visible')[0]
-  #     change = new_text.slice old_text.length
-  #     node.appendChild document.createTextNode(change)
-  #   else
-  #     bundle.find('.readout .visible').text new_text
-  # bundle.find('.readout .unread').text words.slice(index).join(' ')
-  #render the time
   renderTimer()
-
 
   if sync.attempt
     guessAnnotation sync.attempt
 
-
   if latency_log.length > 0
     $('#latency').text(avg(latency_log).toFixed(1) + "/" + stdev(latency_log).toFixed(1) + " (#{latency_log.length})")
-
-
-
 
 setInterval renderState, 10000
 setInterval renderPartial, 50
 
 renderTimer = ->
-  # $('#pause').show !!sync.time_freeze
-  # $('.buzzbtn').attr 'disabled', !!sync.attempt
   if sync.time_freeze
     if sync.attempt
 
@@ -432,10 +380,8 @@ renderTimer = ->
 
   $('.timer').toggleClass 'buzz', !!sync.attempt
 
-
   $('.progress').toggleClass 'progress-warning', !!(sync.time_freeze and !sync.attempt)
   $('.progress').toggleClass 'active progress-danger', !!sync.attempt
-
 
   if sync.attempt
     elapsed = serverTime() - sync.attempt.realTime
@@ -461,7 +407,6 @@ renderTimer = ->
   sign = "+" if ms < 0
   sec = Math.abs(ms) / 1000
 
-
   cs = (sec % 1).toFixed(1).slice(1)
   $('.timer .fraction').text cs
   min = sec / 60
@@ -471,7 +416,6 @@ renderTimer = ->
       str = '0' + str
     str
   $('.timer .face').text sign + pad(min) + ':' + pad(sec % 60)
-
 
 removeSplash = (fn) ->
   bundle = $('.bundle.active')
@@ -496,18 +440,15 @@ changeQuestion = ->
   $('.bundle:not(.bookmarked)').slice(cutoff).slideUp 'normal', -> 
       $(this).remove()
   old = $('#history .bundle').first()
-  # old.find('.answer').css('visibility', 'visible')
   old.removeClass 'active'
   old.find('.breadcrumb').click -> 1 # register a empty event handler so touch devices recognize
   #merge the text nodes, perhaps for performance reasons
   bundle = createBundle().width($('#history').width()) #.css('display', 'none')
   bundle.addClass 'active'
 
-
   $('#history').prepend bundle.hide()
 
   if !last_question and sync.time_freeze and sync.time_freeze - sync.begin_time < 500
-    # console.log 'loading splash page'
     start = $('<div>').addClass('start-page')
     well = $('<div>').addClass('well').appendTo(start)
     $('<button>')
@@ -517,7 +458,6 @@ changeQuestion = ->
       .click ->
         removeSplash ->
           $('.pausebtn').click()
-
 
     bundle.find('.readout').hide().before start
 
@@ -535,8 +475,6 @@ changeQuestion = ->
       old.find('.readout').slideUp("slow")
       $(this).dequeue()
 
-
-
 createBundle = ->
   bundle = $('<div>').addClass('bundle')
   breadcrumb = $('<ul>').addClass('breadcrumb')
@@ -547,9 +485,6 @@ createBundle = ->
   addInfo 'Category', sync.info.category
   addInfo 'Difficulty', sync.info.difficulty
   addInfo 'Tournament', sync.info.year + ' ' + sync.info.tournament
-  # addInfo 'Year', sync.info.year
-  # addInfo 'Number', sync.info.num
-  # addInfo 'Round', sync.info.round
 
   star = $('<a>', {
     href: "#",
@@ -567,14 +502,8 @@ createBundle = ->
       e.stopPropagation()
       e.preventDefault()
 
-  # breadcrumb.append $('<li>').addClass('pull-right').append(star)
-
-
   breadcrumb.append $('<li>').addClass('pull-right').append(star)
   breadcrumb.append $('<li>').addClass('pull-right answer').text("Answer: " + sync.answer)
-
-
-
 
   readout = $('<div>').addClass('readout')
   well = $('<div>').addClass('well').appendTo(readout)
@@ -587,7 +516,6 @@ createBundle = ->
     .append(readout)
     .append(annotations)
 
-
 userSpan = (user) ->
   $('<span>')
     .addClass('user-'+user)
@@ -598,11 +526,9 @@ addAnnotation = (el) ->
   el.slideDown()
   return el
 
-
 guessAnnotation = ({session, text, user, final, correct, interrupt, early}) ->
   # TODO: make this less like chats
   id = user + '-' + session
-  # console.log id
   if $('#' + id).length > 0
     line = $('#' + id)
   else
@@ -621,7 +547,7 @@ guessAnnotation = ({session, text, user, final, correct, interrupt, early}) ->
     $('<span>')
       .addClass('comment')
       .appendTo line
-    ruling = $('<span>').addClass('label ruling').hide()
+    ruling = $('<a>').addClass('label ruling').hide().attr('href', '#')
     line.append ' '
     line.append ruling
     addAnnotation line
@@ -638,9 +564,16 @@ guessAnnotation = ({session, text, user, final, correct, interrupt, early}) ->
       ruling.addClass('label-success').text('Correct')
     else
       ruling.addClass('label-warning').text('Wrong')
+    answer = sync.answer
+    ruling.click ->
+      $('#review .review-judgement').text ruling.text()
+      $('#review .review-answer').text answer
+      $('#review .review-response').text text
+      $('#review').modal('show')
+      return false
+
     if actionMode is 'guess'
       setActionMode ''
-  # line.toggleClass 'typing', !final
 
 chatAnnotation = ({session, text, user, final, time}) ->
   id = user + '-' + session
@@ -675,7 +608,6 @@ sock.on 'leave', ({user}) ->
   line.append " left the room"
   addAnnotation line
 
-
 jQuery('.bundle .breadcrumb').live 'click', ->
   unless $(this).is jQuery('.bundle .breadcrumb').first()
     readout = $(this).parent().find('.readout')
@@ -685,10 +617,11 @@ jQuery('.bundle .breadcrumb').live 'click', ->
 actionMode = ''
 setActionMode = (mode) ->
   actionMode = mode
-  $('.guess_input, .chat_input').blur()
+  $('.prompt_input, .guess_input, .chat_input').blur()
   $('.actionbar' ).toggle mode is ''
   $('.chat_form').toggle mode is 'chat'
   $('.guess_form').toggle mode is 'guess'
+  $('.prompt_form').toggle mode is 'prompt'
   $(window).resize() #reset expandos
 
 $('.chatbtn').click ->
@@ -701,7 +634,6 @@ $('.chatbtn').click ->
 
 $('.skipbtn').click ->
   sock.emit 'skip', 'yay'
-
 
 $('.buzzbtn').click ->
   return if $('.buzzbtn').attr('disabled') is 'disabled'
@@ -716,8 +648,6 @@ $('.buzzbtn').click ->
   # and ask nicely for forgiveness otherwise
   sock.emit 'buzz', 'yay'
 
-
-
 $('.pausebtn').click ->
   removeSplash ->
     if !!sync.time_freeze
@@ -725,16 +655,12 @@ $('.pausebtn').click ->
     else
       sock.emit 'pause', 'yay'
 
-
 $('.chat_input').keydown (e) ->
   if e.keyCode in [47, 111, 191] and $(this).val().length is 0
     e.preventDefault()
 
-
 $('input').keydown (e) ->
   e.stopPropagation() #make it so that the event listener doesnt pick up on stuff
-
-
 
 $('.chat_input').keyup (e) ->
   return if e.keyCode is 13
@@ -760,10 +686,24 @@ $('.guess_input').keyup (e) ->
     final: false
   }
 
-
 $('.guess_form').submit (e) ->
   sock.emit 'guess', {
     text: $('.guess_input').val(), 
+    final: true
+  }
+  e.preventDefault()
+  setActionMode ''
+
+$('.prompt_input').keyup (e) ->
+  return if e.keyCode is 13
+  sock.emit 'prompt', {
+    text: $('.prompt_input').val(), 
+    final: false
+  }
+
+$('.prompt_form').submit (e) ->
+  sock.emit 'prompt', {
+    text: $('.prompt_input').val(), 
     final: true
   }
   e.preventDefault()
@@ -780,7 +720,10 @@ $('body').keydown (e) ->
 
   if e.keyCode is 32
     e.preventDefault()
-    $('.buzzbtn').click()
+    if $('.bundle .start-page').length is 1
+      $('.pausebtn').click()  
+    else
+      $('.buzzbtn').click()
   else if e.keyCode in [83, 78, 74] # S, N, J
     $('.skipbtn').click()
   else if e.keyCode in [80, 82] # P, R
@@ -791,9 +734,7 @@ $('body').keydown (e) ->
 
   console.log e.keyCode
 
-
 # possibly this should be replaced by something smarter using CSS calc()
-# but that would be a 
 $(window).resize ->
   $('.expando').each ->
     add = $(this).find('.add-on').outerWidth()
@@ -821,7 +762,6 @@ if !Modernizr.touch and !mobileLayout()
     placement: -> 
       if mobileLayout() then "error" else "left"
   })
-
 
 if Modernizr.touch
   $('.show-keyboard').hide()

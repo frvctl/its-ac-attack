@@ -69,6 +69,7 @@ module.exports = (app) ->
         user.sockets.push socket
 
     vote: (id, action, val) ->
+      # room.add_socket publicID, sock.id
       @users[id][action] = val
       @sync()
 
@@ -91,6 +92,7 @@ module.exports = (app) ->
 
     unfreeze: ->
       if @time_freeze
+        # @time_offset = new Date - @time_freeze
         @set_time @time_freeze
         @time_freeze = 0
 
@@ -114,6 +116,7 @@ module.exports = (app) ->
           @timeout(metric, time, callback)
         , diff
 
+
     new_question: ->
       @attempt = null
 
@@ -134,12 +137,9 @@ module.exports = (app) ->
       @answer = question.answer
         .replace(/\<\w\w\>/g, '')
         .replace(/\[\w\w\]/g, '')
-      @timing = {
-        list: syllables(word) + 1 for word in @question.split(" "),
-        rate: 1000 * 60 / 3 / 300
-      }
-      {list, rate} = @timing
-      @cumulative = cumsum list, rate
+      @timing = (syllables(word) + 1 for word in @question.split(" "))
+      @rate = Math.round(1000 * 60 / 3 / 300)
+      @cumulative = cumsum @timing, @rate
       @end_time = @begin_time + @cumulative[@cumulative.length - 1] + @answer_duration
       @sync(2)
 
@@ -148,6 +148,7 @@ module.exports = (app) ->
 
     emit: (name, data) ->
       io.sockets.in(@name).emit name, data
+
 
     end_buzz: (session) ->
       if @attempt?.session is session
@@ -202,6 +203,8 @@ module.exports = (app) ->
         # because that's more of a chat thing since with
         # buzzes, you always have room locking anyway
         if data.final
+          # do final stuff
+          console.log 'omg final clubs are so cool ~ zuck'
           @end_buzz @attempt.session
         else
           @sync()
@@ -321,10 +324,10 @@ module.exports = (app) ->
     sock.on 'disconnect', ->
       console.log "someone", publicID, sock.id, "left"
       if room
+        delete room.users[publicID]
         room.del_socket publicID, sock.id
         room.sync(1)
-        if room.users[publicID].sockets.length is 0
-          room.emit 'leave', {user: publicID}
+        room.emit 'leave', {user: publicID}
 
   app.get "/multiplayer", (req, res) ->
     # people = 'kirk,feynman,huxley,robot,ben,batman,panda,pinkman,superhero,celebrity,traitor,alien,lemon,police,whale,astronaut'
