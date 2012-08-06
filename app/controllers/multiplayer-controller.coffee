@@ -344,15 +344,15 @@ module.exports = (app) ->
         room.sync(1)
         room.emit 'leave', {user: publicID}
 
-  app.get "/multiplayer", (req, res) ->
+  app.get "/multiplayer", mid.userInformation, (req, res) ->
     roomName = req.query.roomName
     roomParams = {"difficulty": req.query.difficulty, "gameMode": req.query.gamemode}
     if not roomName
       res.render "multiplayer/multiplayer-selectRoom", {
         title: 'Select Room',
         rooms: rooms,
-        loggedIn: req.loggedIn,
-        roomParams: roomParams
+        roomParams: roomParams,
+        userName: req.userName
       }
     else
       res.redirect '/multiplayer/' + roomName

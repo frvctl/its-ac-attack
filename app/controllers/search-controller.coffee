@@ -1,10 +1,11 @@
 Question = mongoose.model("Question")
+mid = require("../../middleware.coffee")
 
 module.exports = (app) ->
   app.param "searchNext", (req, res, next) ->
     next()
 
-  app.get "/search/:searchNext", (req, res) ->
+  app.get "/search/:searchNext", mid.userInformation, (req, res) ->
     searchIndx = req.query.searchInput
     pg = req.params
     pgNum = parseInt(pg.searchNext, 10)
@@ -38,6 +39,7 @@ module.exports = (app) ->
            greaterIndx: (pgNum * 10) + 10,
            question: question,
            loggedIn: req.loggedIn,
+           userName: req.userName,
            searchIndx: searchIndx
          }
         )
@@ -49,6 +51,7 @@ module.exports = (app) ->
         loggedIn: req.loggedIn,
         lesserIndx: (pgNum * 10),
         greaterIndx: (pgNum * 10) + 10,
+        userName: req.userName,
         searchIndx: searchIndx
       }
   

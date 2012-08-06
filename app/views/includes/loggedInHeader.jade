@@ -14,12 +14,18 @@ div.navbar.navbar-fixed-top
             a(href='/search/0') Search
           li
             a(href='/multiplayer') Multiplayer
-          li
-            a(href='/profile') Profile
-          li
-            a(href='/settings') Settings
-          li.divider
-          li
-            a(href='/logout') Sign out 
+          li.dropdown
+            a(href='#', data-toggle="dropdown").dropdown-toggle 
+              != userName
+                b.caret
+            ul.dropdown-menu
+              li
+                a(href='/login') Profile
+              li
+                a(href='/logout') Settings
+              li.divider
+              li
+                a(href='/profile') Sign out
+
     
 != messages()

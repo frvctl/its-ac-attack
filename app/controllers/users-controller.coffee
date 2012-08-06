@@ -4,11 +4,12 @@ mid = require("../../middleware.coffee")
 module.exports = (app) ->
   app.get "/signup", (req, res) ->
     res.render "users/signup", 
-      title: "Sign Up",
+      title: "Sign Up"
 
   app.get "/login", (req, res) ->
     res.render "users/login", 
-      title: "Login" 
+      title: "Login",
+      userName: req.userName
     
   app.get "/notAuthorized", (req, res) ->
     res.render "users/notAuthorized", 
