@@ -35,6 +35,7 @@ module.exports = (app) ->
            lesserIndx: (pgNum * 10)
            greaterIndx: (pgNum * 10) + 10
            question: question
+           loggedIn: req.loggedIn
            searchIndx: searchIndx
         )
     else

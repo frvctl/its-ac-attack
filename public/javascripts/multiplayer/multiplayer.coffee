@@ -1,8 +1,58 @@
-sock = io.connect()
+inner_socket = io.connect() if io?
 sync = {}
 users = {}
 sync_offsets = []
 sync_offset = 0
+
+sock = {
+  listeners: {},
+  disconnect: ->
+    if inner_socket.socket.connecting
+      virtual_connect = ->
+        if virtual_server?
+          virtual_server.connect()
+        else
+          setTimeout virtual_connect, 100
+      virtual_connect()
+    inner_socket.disconnect()
+
+  emit: (name, data, fn) ->
+    if connected()
+      inner_socket.emit(name, data, fn)
+    else if virtual_server?
+      if name of virtual_server
+        result = virtual_server[name](data)
+        fn(result) if fn
+      else
+        console.log name, data, fn
+    else
+      if $('.active .not-loaded').length > 0
+        el = $('.active .not-loaded')
+      else
+        el = $('<p>').addClass('not-loaded')
+        addImportant el
+      el.data 'num', (el.data('num') || 0) + 1
+      el.text("Offline component not loaded ")
+      if el.data('num') > 1
+        el.append($('<span>').addClass('label').text("x"+el.data('num')))
+
+  server_emit: (name, data) ->
+    sock.listeners[name](data)
+
+  on: (name, listen) ->
+    inner_socket.on(name, listen) if inner_socket?
+    sock.listeners[name] = listen
+}
+
+
+unless io?
+  #do stuff if socket IO doesnt exist, i.e., it's starting up offline
+  $('.new-room').remove()
+
+
+connected = -> inner_socket? and inner_socket.socket.connected
+
+# $('html').toggleClass 'touchscreen', Modernizr.touch
 
 jQuery.fn.disable = (value) ->
   current = $(this).attr('disabled') is 'disabled'
@@ -12,53 +62,55 @@ jQuery.fn.disable = (value) ->
 mobileLayout = -> matchMedia('(max-width: 768px)').matches
 
 avg = (list) ->
-  sum = 0
-  sum += item for item in list
-  sum / list.length
+  sum(list) / list.length
+
+sum = (list) ->
+  s = 0
+  s += item for item in list
+  s
 
 stdev = (list) ->
   mu = avg(list)
   Math.sqrt avg((item - mu) * (item - mu) for item in list)
 
 cumsum = (list, rate) ->
-  sum = 0 #start nonzero, allow pause before rendering
+  s = 0 #start nonzero, allow pause before rendering
   for num in [1].concat(list).slice(0, -1)
-    sum += Math.round(num) * rate #always round!
+    s += Math.round(num) * rate #always round!
 
-###
-  So in this application, we have to juggle around not one, not two, but three notions of time
-  (and possibly four if you consider freezable time, which needs a cooler name, like what 
-  futurama calls intragnizent, so I'll use that, intragnizent time) anyway. So we have three
-  notions of time. The first and simplest is server time, which is an uninterruptable number
-  of milliseconds recorded by the server's +new Date. Problem is, that the client's +new Date
-  isn't exactly the same (can be a few seconds off, not good when we're dealing with precisions
-  of tens of milliseconds). However, we can operate off the assumption that the relative duration
-  of each increment of time is the same (as in, the relativistic effects due to players in
-  moving vehicles at significant fractions of the speed of light are largely unaccounted for
-  in this version of the application), and even imprecise quartz clocks only loose a second
-  every day or so, which is perfectly okay in the short spans of minutes which need to go 
-  unadjusted. So, we can store the round trip and compare the values and calculate a constant
-  offset between the client time and the server time. However, for some reason or another, I
-  decided to implement the notion of "pausing" the game by stopping the flow of some tertiary
-  notion of time (this makes the math relating to calculating the current position of the read
-  somewhat easier).
 
-  This is implemented by an offset which is maintained by the server which goes on top of the
-  notion of server time. 
 
-  Why not just use the abstraction of that pausable (tragnizent) time everywhere and forget
-  about the abstraction of server time, you may ask? Well, there are two reasons, the first
-  of which is that two offsets are maintained anyway (the first prototype only used one, 
-  and this caused problems on iOS because certain http requests would have extremely long
-  latencies when the user was scrolling, skewing the time, this new system allows the system
-  to differentiate a pause from a time skew and maintain a more precise notion of time which
-  is calculated by a moving window average of previously observed values)
+# So in this application, we have to juggle around not one, not two, but three notions of time
+# (and possibly four if you consider freezable time, which needs a cooler name, like what 
+# futurama calls intragnizent, so I'll use that, intragnizent time) anyway. So we have three
+# notions of time. The first and simplest is server time, which is an uninterruptable number
+# of milliseconds recorded by the server's +new Date. Problem is, that the client's +new Date
+# isn't exactly the same (can be a few seconds off, not good when we're dealing with precisions
+# of tens of milliseconds). However, we can operate off the assumption that the relative duration
+# of each increment of time is the same (as in, the relativistic effects due to players in
+# moving vehicles at significant fractions of the speed of light are largely unaccounted for
+# in this version of the application), and even imprecise quartz clocks only loose a second
+# every day or so, which is perfectly okay in the short spans of minutes which need to go 
+# unadjusted. So, we can store the round trip and compare the values and calculate a constant
+# offset between the client time and the server time. However, for some reason or another, I
+# decided to implement the notion of "pausing" the game by stopping the flow of some tertiary
+# notion of time (this makes the math relating to calculating the current position of the read
+# somewhat easier).
 
-  The second reason, is that there are times when you actually need server time. Situations
-  like when you're buzzing and you have a limited time to answer before your window shuts and
-  control gets handed back to the group.
-###
+# This is implemented by an offset which is maintained by the server which goes on top of the
+# notion of server time. 
 
+# Why not just use the abstraction of that pausable (tragnizent) time everywhere and forget
+# about the abstraction of server time, you may ask? Well, there are two reasons, the first
+# of which is that two offsets are maintained anyway (the first prototype only used one, 
+# and this caused problems on iOS because certain http requests would have extremely long
+# latencies when the user was scrolling, skewing the time, this new system allows the system
+# to differentiate a pause from a time skew and maintain a more precise notion of time which
+# is calculated by a moving window average of previously observed values)
+
+# The second reason, is that there are times when you actually need server time. Situations
+# like when you're buzzing and you have a limited time to answer before your window shuts and
+# control gets handed back to the group.
 
 
 time = -> if sync.time_freeze then sync.time_freeze else serverTime() - sync.time_offset
@@ -67,34 +119,47 @@ serverTime = -> new Date - sync_offset
 
 
 window.onbeforeunload = ->
-  localStorage.old_socket = sock.socket.sessionid
+  if inner_socket?
+    localStorage.old_socket = inner_socket.socket.sessionid
   return null
 
 sock.on 'echo', (data, fn) ->
   fn 'alive'
 
 sock.on 'disconnect', ->
-  # make it so that refreshes dont show disco flash
-  setTimeout ->
-    $('#disco').modal('show')
-  , 1000
+  sync.attempt = null if sync.attempt?.user isnt public_id # get rid of any buzzes
+  line = $('<div>').addClass 'well'
+  line.append $('<p>').append("You were ", $('<span class="label label-important">').text("disconnected"), 
+      " from the server for some reason. ", $('<em>').text(new Date))
+  line.append $('<p>').append("This may be due to a drop in the network 
+      connectivity or a malfunction in the server. The client will automatically 
+      attempt to reconnect to the server and in the mean time, the app has automatically transitioned
+      into <b>offline mode</b>. You can continue playing alone with a limited offline set
+      of questions without interruption. However, you might want to try <a href=''>reloading</a>.")
+  addImportant $('<div>').addClass('log disconnect-notice').append(line)
+  sock.emit 'init_offline', 'yay' #obviously server wont pay attention to that
+  renderState()
+
+sock.on 'application_update', ->
+  applicationCache.update() if applicationCache?
 
 public_name = null
 public_id = null
 
-sock.once 'connect', ->
+sock.on 'connect', ->
   $('.actionbar button').disable false
   $('.timer').removeClass 'disabled'
+  $('.disconnect-notice').slideUp()
 
   sock.emit 'join', {
     old_socket: localStorage.old_socket,
-    room_name: channel_name,
-    public_name: public_name
+    room_name: channel_name
   }, (data) ->
     public_name = data.name
     public_id = data.id
     $('#username').val public_name
     $('#username').disable false
+    $('.settings').slideDown()
 
 
 
@@ -103,29 +168,32 @@ $('#username').keyup ->
     sock.emit 'rename', $(this).val()
 
 synchronize = (data) ->
-  # console.log JSON.stringify(data)
+  if data
+    # console.log JSON.stringify(data)
 
-  #here is the rather complicated code to calculate
-  #then offsets of the time synchronization stuff
-  #it's totally not necessary to do this, but whatever
-  #it might make the stuff work better when on an
-  #apple iOS device where screen drags pause the
-  #recieving of sockets/xhrs meaning that the sync
-  #might be artificially inflated, so this could
-  #counteract that. since it's all numerical math
-  #hopefully it'll be fast even if sync_offsets becomes
-  #really really huge
-  sync_offsets.push +new Date - data.real_time
-  thresh = avg sync_offsets
-  below = (item for item in sync_offsets when item <= thresh)
-  sync_offset = avg(below)
+    #here is the rather complicated code to calculate
+    #then offsets of the time synchronization stuff
+    #it's totally not necessary to do this, but whatever
+    #it might make the stuff work better when on an
+    #apple iOS device where screen drags pause the
+    #recieving of sockets/xhrs meaning that the sync
+    #might be artificially inflated, so this could
+    #counteract that. since it's all numerical math
+    #hopefully it'll be fast even if sync_offsets becomes
+    #really really huge
 
-  $('#sync_offset').text(sync_offset.toFixed(1) + '/' + stdev(below).toFixed(1) + " (#{sync_offsets.length})")
+    sync_offsets.push +new Date - data.real_time
+    thresh = avg sync_offsets
+    below = (item for item in sync_offsets when item <= thresh)
+    sync_offset = avg(below)
 
-  # console.log 'sync', data
-  for attr of data
-    sync[attr] = data[attr]
-  if 'users' of data
+    $('#sync_offset').text(sync_offset.toFixed(1) + '/' + stdev(below).toFixed(1) + " (#{sync_offsets.length})")
+
+    # console.log 'sync', data
+    for attr of data
+      sync[attr] = data[attr]
+
+  if !data or 'users' of data
     renderState()
   else
     renderPartial()
@@ -147,6 +215,7 @@ sock.on 'sync', (data) ->
 
 latency_log = []
 testLatency = ->
+  return unless connected()
   initialTime = +new Date
   sock.emit 'echo', {}, (firstServerTime) ->
     recieveTime = +new Date
@@ -188,10 +257,29 @@ computeScore = (user) ->
 formatTime = (timestamp) ->
   date = new Date
   date.setTime timestamp
-  ('0' +date.getHours()).substr(-2,2)+':'+
-  ('0'+date.getMinutes()).substr(-2,2)+':'+
-  ('0'+date.getSeconds()).substr(-2,2)
+  (date.getHours() % 12)+':'+
+  ('0'+date.getMinutes()).substr(-2,2)+
+  #':'+ ('0'+date.getSeconds()).substr(-2,2) +
+  (if date.getHours() > 12 then "pm" else "am")
 
+
+createStatSheet = (user, full) ->
+  table = $('<table>').addClass('table headless')
+  body = $('<tbody>').appendTo(table)
+  row = (name, val) ->
+    $('<tr>')
+      .appendTo(body)
+      .append($("<th>").text(name))
+      .append($("<td>").addClass("value").text(val))
+  row "ID", user.id.slice(0, 10) if full
+  row "Score", computeScore(user)
+  row "Correct", user.correct
+  row "Interrupts", user.interrupts
+  row "Early", user.early  if full
+  row "Incorrect", user.guesses - user.correct  if full
+  row "Guesses", user.guesses 
+  row "Last Seen", formatTime(user.last_action) if full
+  return table
 
 
 renderState = ->
@@ -234,14 +322,16 @@ renderState = ->
           $('.leaderboard tbody tr').not(this).popover 'hide'
           $(this).popover 'toggle'
 
+        # row.mouseover (e) ->
+        #   $('.leaderboard tbody tr').not(this).popover 'hide'
+        #   if $(this).data('popover'),$(this).data('popover').tip().hasClass('out')
+        #     $(this).popover 'show'
+        # row.mouseout (e) ->
+        #   console.log $(this).data('popover'),$(this).data('popover').tip().hasClass('in')
+        #   # $(this).popover 'hide'
       row.attr 'data-original-title', "<span class='user-#{user.id}'>#{user.name}</span>'s stats"
-      row.attr 'data-content', "User ID: #{user.id.slice(0, 16)}\n
-                    Last Seen: #{formatTime(user.last_action)}\n
-                    Correct: #{user.correct}\n
-                    Early: #{user.early}\n
-                    Incorrect: #{user.guesses - user.correct}\n
-                    Interrupts: #{user.interrupts}\n
-                    Guesses: #{user.guesses}".replace(/\n/g, '<br>')
+
+      row.attr 'data-content', $('<div>').append(createStatSheet(user, true)).html()
       row.find('td').remove()
       row.addClass 'sockid-' + user.id
       row.removeClass 'to_remove'
@@ -250,6 +340,7 @@ renderState = ->
         #its me, you idiot
         badge.addClass 'badge-info'
         badge.attr 'title', 'You'
+        $('.singleuser .stats table').replaceWith(createStatSheet(user, !!$('.singleuser').data('full')))
       else
         if user.online
           if serverTime() - user.last_action > 1000 * 60 * 10
@@ -263,20 +354,44 @@ renderState = ->
 
       $('<td>').text(count).append('&nbsp;').append(badge).appendTo row
       name = $('<td>').text(user.name)
+      # if public_id is user.id
+      #   name.append " "
+      #   name.append $('<span>').addClass('label').text('me')
       name.appendTo row
       $('<td>').text(user.interrupts).appendTo row
+      # $('<td>').text(7).appendTo row
 
     list.find('tr.to_remove').remove()
-  if sync.users.length > 0
-    $('.leaderboard').slideDown()
+    # console.log users.join ', '
+    # document.querySelector('#users').innerText = users.join(', ')
+    if sync.users.length > 1 and connected()
+      $('.leaderboard').slideDown()
+      $('.singleuser').slideUp()
+    else
+      $('.leaderboard').slideUp()
+      $('.singleuser').slideDown()
 
   #fix all the expandos
   $(window).resize()
   renderPartial()
 
+
+$('.singleuser').click ->
+  $('.singleuser .stats').slideUp().queue ->
+    $('.singleuser').data 'full', !$('.singleuser').data('full')
+    renderState()
+
+    $(this).dequeue().slideDown()
+
 renderPartial = ->
+
   return unless sync.question and sync.timing
 
+
+  wpm = Math.round(1000 * 60 / 5 / sync.rate)
+  unless $(document.activeElement).is(".speed")
+    if Math.abs($('.speed').val() - wpm) > 1
+      $('.speed').val(wpm)
   #render the question 
   if sync.question isnt last_question
     changeQuestion() #whee slidey
@@ -287,33 +402,55 @@ renderPartial = ->
 
 
   timeDelta = time() - sync.begin_time
-  words = sync.question.replace(/\s+/g, ' ').split ' '
+  words = sync.question.split ' '
+  # {list, rate} = sync.timing
   cumulative = cumsum sync.timing, sync.rate
   index = 0
   index++ while timeDelta > cumulative[index]
+  # index++ if timeDelta > rate
 
   bundle = $('#history .bundle.active') #$('#history .bundle').first()
   new_text = words.slice(0, index).join(' ').trim()
   old_text = bundle.find('.readout .visible').text().replace(/\s+/g, ' ').trim()
   #this more complicated system allows text selection
   #while it's still reading out stuff
-  spots = for buzz in (bundle.data('starts') || [])
-    del = buzz - sync.begin_time
-    i = 0
-    i++ while del > cumulative[i]
-    i - 1
+  # for word in words.slice(0, index)
+  spots = bundle.data('starts') || []
+
+  # console.log "BUZES", spots, words.length
 
   visible = bundle.find('.readout .visible')
   unread = bundle.find('.readout .unread')
   old_spots = visible.data('spots') is spots.join(',')
   if new_text isnt old_text or !old_spots
+    # console.log words
+    # console.log spots
+    # change = new_text.slice old_text.length
+    # console.log change
+    # console.log new_text
+    # console.log old_text
+    # if new_text.indexOf(old_text.trim()) is 0 and old_spots and change.indexOf('*') is -1
+    #   visible.append(change)
+    #   unread.text words.slice(index).join(' ')
+    # else
+    # console.log 'redo'
     visible.data('spots', spots.join(','))
+
+    # textnodes = (node for node in visible[0].childNodes when node.textContent not in [' ', ''])
+    # console.log textnodes, words
+
+    # visible.contents().remove() # setting text to '' retains a blank textnode
     unread.text ''
+    # console.log words[0], "RAWR"
+
+    # $(textnodes).slice(index).remove() #remove the later ones
+
     children = visible.children()
     children.slice(index).remove()
 
     elements = []
     for i in [0...words.length]
+      # console.log words[i]
       element = $('<span>')
       if words[i].indexOf('*') isnt -1
         element.append " <span class='inline-icon'><span class='asterisk'>"+words[i]+"</span><i class='label icon-white icon-asterisk'></i></span> "
@@ -321,7 +458,9 @@ renderPartial = ->
         element.append(words[i] + " ")
 
       if i in spots
+        # element.append('<span class="label label-important">'+words[i]+'</span> ')
         label_type = 'label-important'
+        # console.log spots, i, words.length
         if i is words.length - 1
           label_type = "label-info"
         element.append " <span class='inline-icon'><i class='label icon-white icon-bell  #{label_type}'></i></span> "
@@ -331,30 +470,57 @@ renderPartial = ->
     for i in [0...words.length]
       if i < index
         unless children.eq(i).html() is elements[i].html()
+          # console.log 'removing'
           children.slice(i).remove()
           visible.append elements[i]
 
       else
         unread.append elements[i].contents()
 
+
+
+  # if new_text isnt old_text
+  #   if new_text.indexOf(old_text) is 0
+  #     node = bundle.find('.readout .visible')[0]
+  #     change = new_text.slice old_text.length
+  #     node.appendChild document.createTextNode(change)
+  #   else
+  #     bundle.find('.readout .visible').text new_text
+  # bundle.find('.readout .unread').text words.slice(index).join(' ')
+  #render the time
   renderTimer()
+
 
   if sync.attempt
     guessAnnotation sync.attempt
 
+
   if latency_log.length > 0
     $('#latency').text(avg(latency_log).toFixed(1) + "/" + stdev(latency_log).toFixed(1) + " (#{latency_log.length})")
+
+
+
 
 setInterval renderState, 10000
 setInterval renderPartial, 50
 
 renderTimer = ->
+  # $('#pause').show !!sync.time_freeze
+  # $('.buzzbtn').attr 'disabled', !!sync.attempt
+  if connected()
+    $('.offline').fadeOut()
+  else
+    $('.offline').fadeIn()
   if sync.time_freeze
     if sync.attempt
-
-      starts = ($('.bundle.active').data('starts') || [])
-      starts.push(sync.attempt.start) if sync.attempt.start not in starts
-      $('.bundle.active').data('starts', starts)
+      do ->
+        cumulative = cumsum sync.timing, sync.rate
+        del = sync.attempt.start - sync.begin_time
+        i = 0
+        i++ while del > cumulative[i]
+        starts = ($('.bundle.active').data('starts') || [])
+        starts.push(i - 1) if (i - 1) not in starts
+        $('.bundle.active').data('starts', starts)
 
       $('.label.pause').hide()
       $('.label.buzz').fadeIn()
@@ -380,8 +546,10 @@ renderTimer = ->
 
   $('.timer').toggleClass 'buzz', !!sync.attempt
 
+
   $('.progress').toggleClass 'progress-warning', !!(sync.time_freeze and !sync.attempt)
   $('.progress').toggleClass 'active progress-danger', !!sync.attempt
+
 
   if sync.attempt
     elapsed = serverTime() - sync.attempt.realTime
@@ -407,6 +575,7 @@ renderTimer = ->
   sign = "+" if ms < 0
   sec = Math.abs(ms) / 1000
 
+
   cs = (sec % 1).toFixed(1).slice(1)
   $('.timer .fraction').text cs
   min = sec / 60
@@ -416,6 +585,7 @@ renderTimer = ->
       str = '0' + str
     str
   $('.timer .face').text sign + pad(min) + ':' + pad(sec % 60)
+
 
 removeSplash = (fn) ->
   bundle = $('.bundle.active')
@@ -440,15 +610,18 @@ changeQuestion = ->
   $('.bundle:not(.bookmarked)').slice(cutoff).slideUp 'normal', -> 
       $(this).remove()
   old = $('#history .bundle').first()
+  # old.find('.answer').css('visibility', 'visible')
   old.removeClass 'active'
   old.find('.breadcrumb').click -> 1 # register a empty event handler so touch devices recognize
   #merge the text nodes, perhaps for performance reasons
   bundle = createBundle().width($('#history').width()) #.css('display', 'none')
   bundle.addClass 'active'
 
+
   $('#history').prepend bundle.hide()
 
   if !last_question and sync.time_freeze and sync.time_freeze - sync.begin_time < 500
+    # console.log 'loading splash page'
     start = $('<div>').addClass('start-page')
     well = $('<div>').addClass('well').appendTo(start)
     $('<button>')
@@ -458,6 +631,7 @@ changeQuestion = ->
       .click ->
         removeSplash ->
           $('.pausebtn').click()
+
 
     bundle.find('.readout').hide().before start
 
@@ -475,8 +649,12 @@ changeQuestion = ->
       old.find('.readout').slideUp("slow")
       $(this).dequeue()
 
+
+
 createBundle = ->
   bundle = $('<div>').addClass('bundle')
+  important = $('<div>').addClass 'important'
+  bundle.append(important)
   breadcrumb = $('<ul>').addClass('breadcrumb')
   addInfo = (name, value) ->
     breadcrumb.find('li').last().append $('<span>').addClass('divider').text('/')
@@ -485,6 +663,17 @@ createBundle = ->
   addInfo 'Category', sync.info.category
   addInfo 'Difficulty', sync.info.difficulty
   addInfo 'Tournament', sync.info.year + ' ' + sync.info.tournament
+  # addInfo 'Year', sync.info.year
+  # addInfo 'Number', sync.info.num
+  # addInfo 'Round', sync.info.round
+  # addInfo 'Report', ''
+
+  breadcrumb.find('li').last().append $('<span>').addClass('divider').text('/')
+  breadcrumb.append $('<li>').addClass('clickable').text('Report').click (e) ->
+    console.log 'report question'
+    $('#report-question').modal('show')
+    e.stopPropagation()
+    e.preventDefault()
 
   star = $('<a>', {
     href: "#",
@@ -502,8 +691,14 @@ createBundle = ->
       e.stopPropagation()
       e.preventDefault()
 
+  # breadcrumb.append $('<li>').addClass('pull-right').append(star)
+
+
   breadcrumb.append $('<li>').addClass('pull-right').append(star)
-  breadcrumb.append $('<li>').addClass('pull-right answer').text("Answer: " + sync.answer)
+  breadcrumb.append $('<li>').addClass('pull-right answer').text(sync.answer)
+
+
+
 
   readout = $('<div>').addClass('readout')
   well = $('<div>').addClass('well').appendTo(readout)
@@ -516,19 +711,26 @@ createBundle = ->
     .append(readout)
     .append(annotations)
 
+
 userSpan = (user) ->
   $('<span>')
     .addClass('user-'+user)
     .text(users[user]?.name || '[name missing]')
 
 addAnnotation = (el) ->
-  el.css('display', 'none').prependTo $('#history .bundle .annotations').first()
+  el.css('display', 'none').prependTo $('#history .bundle.active .annotations')
   el.slideDown()
   return el
 
-guessAnnotation = ({session, text, user, final, correct, interrupt, early}) ->
+addImportant = (el) ->
+  el.css('display', 'none').prependTo $('#history .bundle.active .important')
+  el.slideDown()
+  return el
+
+guessAnnotation = ({session, text, user, done, correct, interrupt, early}) ->
   # TODO: make this less like chats
   id = user + '-' + session
+  # console.log id
   if $('#' + id).length > 0
     line = $('#' + id)
   else
@@ -551,14 +753,14 @@ guessAnnotation = ({session, text, user, final, correct, interrupt, early}) ->
     line.append ' '
     line.append ruling
     addAnnotation line
-  if final
+  if done
     if text is ''
       line.find('.comment').html('<em>(blank)</em>')
     else
       line.find('.comment').text(text)
   else
     line.find('.comment').text(text)
-  if final
+  if done
     ruling = line.find('.ruling').show().css('display', 'inline')
     if correct
       ruling.addClass('label-success').text('Correct')
@@ -566,7 +768,10 @@ guessAnnotation = ({session, text, user, final, correct, interrupt, early}) ->
       ruling.addClass('label-warning').text('Wrong')
     answer = sync.answer
     ruling.click ->
-      $('#review .review-judgement').text ruling.text()
+      $('#review .review-judgement')
+        .after(ruling.clone().addClass('review-judgement'))
+        .remove()
+
       $('#review .review-answer').text answer
       $('#review .review-response').text text
       $('#review').modal('show')
@@ -574,8 +779,9 @@ guessAnnotation = ({session, text, user, final, correct, interrupt, early}) ->
 
     if actionMode is 'guess'
       setActionMode ''
+  # line.toggleClass 'typing', !done
 
-chatAnnotation = ({session, text, user, final, time}) ->
+chatAnnotation = ({session, text, user, done, time}) ->
   id = user + '-' + session
   if $('#' + id).length > 0
     line = $('#' + id)
@@ -587,14 +793,14 @@ chatAnnotation = ({session, text, user, final, time}) ->
       .addClass('comment')
       .appendTo line
     addAnnotation line
-  if final
+  if done
     if text is ''
       line.find('.comment').html('<em>(no message)</em>')
     else
       line.find('.comment').text(text)
   else
     line.find('.comment').text(text)
-  line.toggleClass 'typing', !final
+  line.toggleClass 'typing', !done
 
 sock.on 'introduce', ({user}) ->
   line = $('<p>').addClass 'log'
@@ -607,6 +813,7 @@ sock.on 'leave', ({user}) ->
   line.append userSpan(user)
   line.append " left the room"
   addAnnotation line
+
 
 jQuery('.bundle .breadcrumb').live 'click', ->
   unless $(this).is jQuery('.bundle .breadcrumb').first()
@@ -633,7 +840,9 @@ $('.chatbtn').click ->
     .focus()
 
 $('.skipbtn').click ->
+  removeSplash()
   sock.emit 'skip', 'yay'
+
 
 $('.buzzbtn').click ->
   return if $('.buzzbtn').attr('disabled') is 'disabled'
@@ -648,6 +857,8 @@ $('.buzzbtn').click ->
   # and ask nicely for forgiveness otherwise
   sock.emit 'buzz', 'yay'
 
+
+
 $('.pausebtn').click ->
   removeSplash ->
     if !!sync.time_freeze
@@ -655,26 +866,30 @@ $('.pausebtn').click ->
     else
       sock.emit 'pause', 'yay'
 
+
 $('.chat_input').keydown (e) ->
   if e.keyCode in [47, 111, 191] and $(this).val().length is 0
     e.preventDefault()
 
+
 $('input').keydown (e) ->
   e.stopPropagation() #make it so that the event listener doesnt pick up on stuff
+
+
 
 $('.chat_input').keyup (e) ->
   return if e.keyCode is 13
   sock.emit 'chat', {
     text: $('.chat_input').val(), 
     session: $('.chat_input').data('input_session'), 
-    final: false
+    done: false
   }
 
 $('.chat_form').submit (e) ->
   sock.emit 'chat', {
     text: $('.chat_input').val(), 
     session: $('.chat_input').data('input_session'), 
-    final: true
+    done: true
   }
   e.preventDefault()
   setActionMode ''
@@ -683,13 +898,14 @@ $('.guess_input').keyup (e) ->
   return if e.keyCode is 13
   sock.emit 'guess', {
     text: $('.guess_input').val(), 
-    final: false
+    done: false
   }
+
 
 $('.guess_form').submit (e) ->
   sock.emit 'guess', {
     text: $('.guess_input').val(), 
-    final: true
+    done: true
   }
   e.preventDefault()
   setActionMode ''
@@ -698,16 +914,18 @@ $('.prompt_input').keyup (e) ->
   return if e.keyCode is 13
   sock.emit 'prompt', {
     text: $('.prompt_input').val(), 
-    final: false
+    done: false
   }
+
 
 $('.prompt_form').submit (e) ->
   sock.emit 'prompt', {
     text: $('.prompt_input').val(), 
-    final: true
+    done: true
   }
   e.preventDefault()
   setActionMode ''
+
 
 $('body').keydown (e) ->
   if actionMode is 'chat'
@@ -732,12 +950,22 @@ $('body').keydown (e) ->
     e.preventDefault()
     $('.chatbtn').click()
 
-  console.log e.keyCode
+  # console.log e.keyCode
+
+
+$('.speed').change ->
+  $('.speed').not(this).val($(this).val())
+  rate = 1000 * 60 / 5 / Math.round($(this).val())
+  sock.emit 'speed', rate
+  # console.log rate
+
 
 # possibly this should be replaced by something smarter using CSS calc()
+# but that would be a 
 $(window).resize ->
   $('.expando').each ->
-    add = $(this).find('.add-on').outerWidth()
+    add = sum($(i).outerWidth() for i in $(this).find('.add-on'))
+    # console.log add
     size = $(this).width()
     outer = $(this).find('input').outerWidth() - $(this).find('input').width()
     # console.log 'exp', add, outer, size
@@ -757,11 +985,12 @@ if !Modernizr.touch and !mobileLayout()
   $('.actionbar button').click -> 
     $('.actionbar button').tooltip 'hide'
 
-  $('#history').tooltip({
-    selector: "a[rel=tooltip]", 
+  $('#history, .settings').tooltip({
+    selector: "[rel=tooltip]", 
     placement: -> 
       if mobileLayout() then "error" else "left"
   })
+
 
 if Modernizr.touch
   $('.show-keyboard').hide()
@@ -769,3 +998,53 @@ if Modernizr.touch
 else
   $('.show-keyboard').show()
   $('.show-touch').hide()
+
+
+handleCacheEvent = ->
+  status = applicationCache.status
+  switch applicationCache.status
+    when applicationCache.UPDATEREADY
+      $('#cachestatus').text 'Updated'
+      console.log 'update is ready'
+      applicationCache.swapCache()
+      $('#update').slideDown()    
+
+      if localStorage.auto_reload is "yay"
+        setTimeout ->
+          location.reload()
+        , 500
+    when applicationCache.UNCACHED
+      $('#cachestatus').text 'Uncached'
+    when applicationCache.OBSOLETE
+      $('#cachestatus').text 'Obsolete'
+    when applicationCache.IDLE
+      $('#cachestatus').text 'Cached'
+    when applicationCache.DOWNLOADING
+      $('#cachestatus').text 'Downloading'
+    when applicationCache.CHECKING
+      $('#cachestatus').text 'Checking'
+
+do -> # isolate variables from globals
+  if window.applicationCache
+    for name in ['cached', 'checking', 'downloading', 'error', 'noupdate', 'obsolete', 'progress', 'updateready']
+      applicationCache.addEventListener name, handleCacheEvent
+
+# asynchronously load offline components
+#also, html5slider isnt actually for offline,
+# but it can be loaded async, so lets do that, 
+# and reuse all the crap that can be reused
+setTimeout ->
+  window.exports = {}
+  window.require = -> window.exports
+  deps = ["html5slider", "levenshtein", "removeDiacritics", "answerparse", "syllable", "names", "offline"]
+  loadNextResource = ->
+    $.ajax {
+      url: "lib/#{deps.shift()}.js",
+      cache: true,
+      dataType: "script",
+      success: ->
+        if deps.length > 0
+          loadNextResource()
+    }
+  loadNextResource()
+, 10

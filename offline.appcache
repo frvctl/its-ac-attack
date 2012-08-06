@@ -1,0 +1,29 @@
+CACHE MANIFEST
+# INSERT_DATE Sat Aug 04 2012 20:09:43 GMT-0400 (EDT)
+
+CACHE:
+/favicon.ico
+questions.txt
+public/javascripts/lib/bootstrap.min.js
+public/javascripts/lib/modernizr.js
+public/javascripts/lib/levenshtein.js
+public/javascripts/lib/removeDiacritics.js
+public/javascripts/lib/syllable.js
+public/javascripts/multiplayer/names.js
+public/javascripts/answer/answerparse.js
+public/javascripts/multiplayer/offline.js
+public/javascripts/multiplayer/client.js
+public/javascripts/lib/html5slider.js
+public/stylesheets/bootstrap.css
+public/stylesheets/responsive.css
+public/stylesheets/protobowl.css
+public/font/fontawesome-webfont.woff
+//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
+
+
+NETWORK:
+/socket.io
+
+
+FALLBACK:
+/ offline

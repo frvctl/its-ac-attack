@@ -213,3 +213,6 @@ footer ul li{
     visibility:hidden
 }
 
+.navbar-inner{
+  background-color: red;
+}

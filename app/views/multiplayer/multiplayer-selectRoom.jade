@@ -1,9 +1,5 @@
 h1 Select a Room
 
-p Join an already occupied room with your friends or create your own
-
-hr
-
 #roomTable
   table.table
     thead
@@ -14,20 +10,60 @@ hr
         th Difficulty
     tbody
       each room, i in rooms
-        - console.log(Object.keys(room.users).length)
-        tr
-          td 
-            a(href='/multiplayer/' + room.name)= room.name
-          td= Object.keys(room.users).length 
-          td Not yet made
-          td Not yet made
+        if Object.keys(room.users).length > 0 
+          tr
+            td 
+              a(href='/multiplayer/' + room.name)= room.name
+            td= Object.keys(room.users).length 
+            td= roomParams.difficulty
+            td= roomParams.gameMode
 hr
 
-form(actions='', method='get')#makeroom
-  #roomName
-    p Create your Own Room
-    label Name of Room
-    input(type='text', name='roomName')
-  div.btn.btn-primary Make Private
+form(actions='', method='get').form-horizontal.center#makeroom
+  label Name of Room
+  input(type='text', name='roomName').input-large
+  div#settings.btn.btn-primary Make the Room
+
+div.modal.hide#settingsModal
+  div.modal-header
+    button.close(type="button", data-dismiss="modal") ×
+    h3 Channel Settings
+  div.modal-body
+    div#privacy
+      h4 Privacy
+      form.well
+        input(type='checkbox', name='privacy', value='private')
+        | Private
+        br
+        input(type='checkbox', name='public', value='public') 
+        | Public
+      hr
+    div#difficulty
+      h4 Difficulty
+      form.well
+        input(type='checkbox', name='easy', value='easy')
+        | Easy
+        br
+        input(type='checkbox', name='medium', value='medium') 
+        | Medium
+        br
+        input(type='checkbox', name='hard', value='hard') 
+        | Hard
+      hr
+    div#gameMode
+      h4 Game Mode
+      form.well
+        input(type='checkbox', name='blah') 
+        | Blah 1
+        br
+        input(type='checkbox', name='blah2')
+        | Blah 2
+        br
+        input(type='checkbox', name='blah3')
+        | Blah 3
+
+
+  div.modal-footer
+    a.btn.btn-primary(href="#", data-dismiss="modal") Done
 
 script(src='../../javascripts/multiplayer/lobby.js')

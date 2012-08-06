@@ -10,7 +10,6 @@ module.exports = (app) ->
   syllables = require('../../public/javascripts/answer/syllable').syllables
   parseCookie = require('express/node_modules/connect').utils.parseCookie
   crypto = require('crypto')
-
   
   io.configure 'development', () ->
     io.set 'log level', 2
@@ -48,6 +47,7 @@ module.exports = (app) ->
       @name = name
       @answer_duration = 1000 * 5
       @time_offset = 0
+      @rate = 1000 * 60 / 5 / 200
       @freeze()
       @new_question()
       @users = {}
@@ -119,8 +119,6 @@ module.exports = (app) ->
 
     new_question: ->
       @attempt = null
-
-      @begin_time = @time()
       question = questions[Math.floor(questions.length * Math.random())]
       @info = {
         category: question.category, 
@@ -134,14 +132,46 @@ module.exports = (app) ->
         .replace(/FTP/g, 'For 10 points')
         .replace(/^\[.*?\]/, '')
         .replace(/\n/g, ' ')
+        .replace(/\s+/g, ' ')
       @answer = question.answer
         .replace(/\<\w\w\>/g, '')
         .replace(/\[\w\w\]/g, '')
+
+      @begin_time = @time()
       @timing = (syllables(word) + 1 for word in @question.split(" "))
-      @rate = Math.round(1000 * 60 / 3 / 300)
-      @cumulative = cumsum @timing, @rate
-      @end_time = @begin_time + @cumulative[@cumulative.length - 1] + @answer_duration
+      @set_speed @rate #do the math with speeds
+      # @cumulative = cumsum @timing, @rate #todo: comment out
+      # @end_time = @begin_time + @cumulative[@cumulative.length - 1] + @answer_duration
       @sync(2)
+
+    set_speed: (rate) ->
+      now = @time() # take a snapshot of time to do math with
+      #first thing's first, recalculate the cumulative array
+      @cumulative = cumsum @timing, @rate
+      #calculate percentage of reading right now
+      elapsed = now - @begin_time
+      duration = @cumulative[@cumulative.length - 1]
+      done = elapsed / duration
+
+      # if it's past the actual reading time
+      # this means altering the rate doesnt actually
+      # affect the length of the answer_duration
+      remainder = 0
+      if done > 1
+        remainder = elapsed - duration
+        done = 1
+
+      # set the new rate
+      @rate = rate
+      # recalculate the reading intervals
+      @cumulative = cumsum @timing, @rate
+      new_duration = @cumulative[@cumulative.length - 1]
+      #how much time has elapsed in the new timescale
+      @begin_time = now - new_duration * done - remainder
+      # set the ending time
+      @end_time = @begin_time + new_duration + @answer_duration
+
+
 
     skip: ->
       @new_question()
@@ -151,9 +181,10 @@ module.exports = (app) ->
 
 
     end_buzz: (session) ->
+      #killit, killitwithfire
       if @attempt?.session is session
         @touch @attempt.user
-        @attempt.final = true
+        @attempt.done = true
         @attempt.correct = checkAnswer @attempt.text, @answer
 
         @sync()
@@ -185,7 +216,7 @@ module.exports = (app) ->
           text: '',
           early: early_index and @time() < @begin_time + @cumulative[early_index],
           interrupt: @time() < @end_time - @answer_duration,
-          final: false
+          done: false
         }
 
         @users[user].guesses++
@@ -202,9 +233,9 @@ module.exports = (app) ->
         # lets just ignore the input session attribute
         # because that's more of a chat thing since with
         # buzzes, you always have room locking anyway
-        if data.final
-          # do final stuff
-          console.log 'omg final clubs are so cool ~ zuck'
+        if data.done
+          # do done stuff
+          console.log 'omg done clubs are so cool ~ zuck'
           @end_buzz @attempt.session
         else
           @sync()
@@ -226,9 +257,12 @@ module.exports = (app) ->
             actionvotes.push id
           else
             nay++
+        # console.log yay, 'yay', nay, 'nay', action
         if actionvotes.length > 0
           data.voting[action] = actionvotes
+        # console.log yay, nay, "VOTES FOR", action
         if yay / (yay + nay) > 0
+          # client.del(action) for client in io.sockets.clients(@name)
           delete @users[id][action] for id of @users
           this[action]()
       blacklist = ["name", "question", "answer", "timing", "voting", "info", "cumulative", "users"]
@@ -257,14 +291,6 @@ module.exports = (app) ->
     hash.update(text)
     hash.digest('hex')
 
-  generateName = ->
-    adjective = 'flaming,aberrant,agressive,warty,hoary,breezy,dapper,edgy,feisty,gutsy,hardy,intrepid,jaunty,karmic,lucid,maverick,natty,oneric,precise,quantal,quizzical,curious,derisive,bodacious,nefarious,nuclear,nonchalant'
-    animal = 'monkey,axolotl,warthog,hedgehog,badger,drake,fawn,gibbon,heron,ibex,jackalope,koala,lynx,meerkat,narwhal,ocelot,penguin,quetzal,kodiak,cheetah,puma,jaguar,panther,tiger,leopard,lion,neanderthal,walrus,mushroom,dolphin'
-    pick = (list) -> 
-      n = list.split(',')
-      n[Math.floor(n.length * Math.random())]
-    pick(adjective) + " " + pick(animal)
-
 
   rooms = {}
   io.sockets.on 'connection', (sock) ->
@@ -285,7 +311,7 @@ module.exports = (app) ->
       room = rooms[room_name]
       room.add_socket publicID, sock.id
       unless 'name' of room.users[publicID]
-        room.users[publicID].name = generateName()
+        room.users[publicID].name = require('../../public/javascripts/multiplayer/names').generateName()
       fn {
         id: publicID,
         name: room.users[publicID].name
@@ -297,18 +323,33 @@ module.exports = (app) ->
       callback +new Date
 
     sock.on 'rename', (name) ->
+      # sock.set 'name', name
       room.users[publicID].name = name
       room.touch(publicID)
       room.sync(1) if room
 
     sock.on 'skip', (vote) ->
+      # sock.set 'skip', vote
+      # room.add_socket publicID, sock.id
+      # room.users[publicID].skip = vote
+      # room.sync() if room
       room.vote publicID, 'skip', vote
 
     sock.on 'pause', (vote) ->
+      # sock.set 'pause', vote
+      # room.users[publicID].pause = vote
+      # room.sync() if room
       room.vote publicID, 'pause', vote
 
     sock.on 'unpause', (vote) ->
+      # sock.set 'unpause', vote
       room.vote publicID, 'unpause', vote
+      # room.users[publicID].unpause = vote
+      # room.sync() if room
+
+    sock.on 'speed', (data) ->
+      room.set_speed data
+      room.sync()
 
     sock.on 'buzz', (data, fn) ->
       room.buzz(publicID, fn) if room
@@ -316,12 +357,13 @@ module.exports = (app) ->
     sock.on 'guess', (data) ->
       room.guess(publicID, data)  if room
 
-    sock.on 'chat', ({text, final, session}) ->
+    sock.on 'chat', ({text, done, session}) ->
       if room
         room.touch publicID
-        room.emit 'chat', {text: text, session:  session, user: publicID, final: final, time: room.serverTime()}
+        room.emit 'chat', {text: text, session:  session, user: publicID, done: done, time: room.serverTime()}
 
     sock.on 'disconnect', ->
+      # id = sock.id
       console.log "someone", publicID, sock.id, "left"
       if room
         delete room.users[publicID]
@@ -338,10 +380,13 @@ module.exports = (app) ->
     #   n[Math.floor(n.length * Math.random())]
     # console.log(req.params.channel)
     roomName = req.query.roomName
+    roomParams = {"difficulty": req.query.difficulty, "gameMode": req.query.gamemode}
     if req.loggedIn and not roomName
       res.render "multiplayer/multiplayer-selectRoom", {
         title: 'Select Room',
-        rooms: rooms
+        rooms: rooms,
+        loggedIn: req.loggedIn
+        roomParams: roomParams
       }
     else if req.loggedIn and roomName
       res.redirect '/multiplayer/' + roomName
