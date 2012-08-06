@@ -69,7 +69,6 @@ module.exports = (app) ->
         user.sockets.push socket
 
     vote: (id, action, val) ->
-      # room.add_socket publicID, sock.id
       @users[id][action] = val
       @sync()
 
@@ -92,7 +91,6 @@ module.exports = (app) ->
 
     unfreeze: ->
       if @time_freeze
-        # @time_offset = new Date - @time_freeze
         @set_time @time_freeze
         @time_freeze = 0
 
@@ -115,7 +113,6 @@ module.exports = (app) ->
         setTimeout =>
           @timeout(metric, time, callback)
         , diff
-
 
     new_question: ->
       @attempt = null
@@ -140,8 +137,6 @@ module.exports = (app) ->
       @begin_time = @time()
       @timing = (syllables(word) + 1 for word in @question.split(" "))
       @set_speed @rate #do the math with speeds
-      # @cumulative = cumsum @timing, @rate #todo: comment out
-      # @end_time = @begin_time + @cumulative[@cumulative.length - 1] + @answer_duration
       @sync(2)
 
     set_speed: (rate) ->
@@ -171,17 +166,13 @@ module.exports = (app) ->
       # set the ending time
       @end_time = @begin_time + new_duration + @answer_duration
 
-
-
     skip: ->
       @new_question()
 
     emit: (name, data) ->
       io.sockets.in(@name).emit name, data
 
-
     end_buzz: (session) ->
-      #killit, killitwithfire
       if @attempt?.session is session
         @touch @attempt.user
         @attempt.done = true
@@ -198,7 +189,6 @@ module.exports = (app) ->
           @users[@attempt.user].interrupts++
         @attempt = null #g'bye
         @sync(1) #two syncs in one request!
-
 
     buzz: (user) -> #todo, remove the callback and replace it with a sync listener
       @touch user
@@ -257,12 +247,9 @@ module.exports = (app) ->
             actionvotes.push id
           else
             nay++
-        # console.log yay, 'yay', nay, 'nay', action
         if actionvotes.length > 0
           data.voting[action] = actionvotes
-        # console.log yay, nay, "VOTES FOR", action
         if yay / (yay + nay) > 0
-          # client.del(action) for client in io.sockets.clients(@name)
           delete @users[id][action] for id of @users
           this[action]()
       blacklist = ["name", "question", "answer", "timing", "voting", "info", "cumulative", "users"]
@@ -285,12 +272,10 @@ module.exports = (app) ->
 
       io.sockets.in(@name).emit 'sync', data
 
-
   sha1 = (text) ->
     hash = crypto.createHash('sha1')
     hash.update(text)
     hash.digest('hex')
-
 
   rooms = {}
   io.sockets.on 'connection', (sock) ->
@@ -323,29 +308,18 @@ module.exports = (app) ->
       callback +new Date
 
     sock.on 'rename', (name) ->
-      # sock.set 'name', name
       room.users[publicID].name = name
       room.touch(publicID)
       room.sync(1) if room
 
     sock.on 'skip', (vote) ->
-      # sock.set 'skip', vote
-      # room.add_socket publicID, sock.id
-      # room.users[publicID].skip = vote
-      # room.sync() if room
       room.vote publicID, 'skip', vote
 
     sock.on 'pause', (vote) ->
-      # sock.set 'pause', vote
-      # room.users[publicID].pause = vote
-      # room.sync() if room
       room.vote publicID, 'pause', vote
 
     sock.on 'unpause', (vote) ->
-      # sock.set 'unpause', vote
       room.vote publicID, 'unpause', vote
-      # room.users[publicID].unpause = vote
-      # room.sync() if room
 
     sock.on 'speed', (data) ->
       room.set_speed data
@@ -363,7 +337,6 @@ module.exports = (app) ->
         room.emit 'chat', {text: text, session:  session, user: publicID, done: done, time: room.serverTime()}
 
     sock.on 'disconnect', ->
-      # id = sock.id
       console.log "someone", publicID, sock.id, "left"
       if room
         delete room.users[publicID]
@@ -372,37 +345,24 @@ module.exports = (app) ->
         room.emit 'leave', {user: publicID}
 
   app.get "/multiplayer", (req, res) ->
-    # people = 'kirk,feynman,huxley,robot,ben,batman,panda,pinkman,superhero,celebrity,traitor,alien,lemon,police,whale,astronaut'
-    # verb = 'on,enveloping,eating,drinking,in,near,sleeping,destruction,arresting,cloning,around,jumping,scrambling'
-    # noun = 'mountain,drugs,house,asylum,elevator,scandal,planet,school,brick,lamp,water,paper,friend,toilet,airplane,cow,pony'
-    # pick = (list) -> 
-    #   n = list.split(',')
-    #   n[Math.floor(n.length * Math.random())]
-    # console.log(req.params.channel)
     roomName = req.query.roomName
     roomParams = {"difficulty": req.query.difficulty, "gameMode": req.query.gamemode}
-    if req.loggedIn and not roomName
+    if not roomName
       res.render "multiplayer/multiplayer-selectRoom", {
         title: 'Select Room',
         rooms: rooms,
-        loggedIn: req.loggedIn
+        loggedIn: req.loggedIn,
         roomParams: roomParams
       }
-    else if req.loggedIn and roomName
-      res.redirect '/multiplayer/' + roomName
     else
-      res.redirect '/notAuthorized'
+      res.redirect '/multiplayer/' + roomName
 
   app.get "/multiplayer/:channel", mid.userInformation, (req, res) ->
-    name = req.params.channel
-    if req.loggedIn
-      res.render 'multiplayer/multiplayer-practice', {
-        title: 'Multiplayer Practice'
-        name,
-        loggedIn: req.loggedIn,
-        user: req.userInfo,
-        userName: req.userName 
-      }
-    else
-      res.render 'users/notAuthorized', 
-        title: 'Your are not Authorized'
+    name = req.params.channel    
+    res.render 'multiplayer/multiplayer-practice', {
+      title: 'Multiplayer Practice'
+      name,
+      loggedIn: req.loggedIn,
+      user: req.userInfo,
+      userName: req.userName 
+    }

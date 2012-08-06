@@ -10,6 +10,8 @@ module.exports = (app) ->
     pgNum = parseInt(pg.searchNext, 10)
     nPerPage = 10
     numToSkip = 1
+    loggedIn = req.loggedIn
+    console.log(loggedIn)
     if searchIndx
       Question.find
         $or: [
@@ -29,21 +31,24 @@ module.exports = (app) ->
           skip: numToSkip
           limit: 1
         ),((err, question) -> 
-         res.render "search/search",
-           title: "Search"
-           counter: pgNum
-           lesserIndx: (pgNum * 10)
-           greaterIndx: (pgNum * 10) + 10
-           question: question
-           loggedIn: req.loggedIn
+         res.render "search/search", {
+           title: "Search",
+           counter: pgNum,
+           lesserIndx: (pgNum * 10),
+           greaterIndx: (pgNum * 10) + 10,
+           question: question,
+           loggedIn: req.loggedIn,
            searchIndx: searchIndx
+         }
         )
     else
-      res.render "search/search",
-        title: "Search"
-        question: []
-        counter: pgNum
-        lesserIndx: (pgNum * 10)
-        greaterIndx: (pgNum * 10) + 10
+      res.render "search/search", {
+        title: "Search",
+        question: [],
+        counter: pgNum,
+        loggedIn: req.loggedIn,
+        lesserIndx: (pgNum * 10),
+        greaterIndx: (pgNum * 10) + 10,
         searchIndx: searchIndx
+      }
   

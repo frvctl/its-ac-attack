@@ -61,6 +61,12 @@ bootApplication = (app) ->
     slogan: (req, res) ->
       "an app"
 
+    loggedIn: (req) ->
+      if req.loggedIn
+        return true
+      else
+        return false
+
     messages: require("express-messages")
 
   app.set "showStackError", false

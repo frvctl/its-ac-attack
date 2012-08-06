@@ -1,6 +1,3 @@
-script 
-  $('.dropdown-toggle').dropdown()
-
 div.navbar.navbar-fixed-top
   div.navbar-inner
     div.container
@@ -18,8 +15,11 @@ div.navbar.navbar-fixed-top
           li
             a(href='/multiplayer') Multiplayer
           li
-            a(href='/login') Login
+            a(href='/profile') Profile
           li
-            a(href='/signup') Sign up
-
+            a(href='/settings') Settings
+          li.divider
+          li
+            a(href='/logout') Sign out 
+    
 != messages()

@@ -3,6 +3,9 @@ html
   != partial('../includes/head')
   body
     .container
-      != partial('../includes/header')
+      if loggedIn
+        != partial('../includes/loggedInHeader')
+      else
+        != partial('../includes/header')
       != body
     != partial('../includes/footer')
