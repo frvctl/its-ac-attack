@@ -7,13 +7,12 @@ div.navbar.navbar-fixed-top
         span.icon-bar
       a(href='/home')#logo Proto Bowl
       div.nav-collapse.collapse
-        ul.nav.nav-pull-right
-          li
-            a(href='/home') Home
-          li
-            a(href='/search/0') Search
+        ul.nav
           li
             a(href='/multiplayer') Multiplayer
+          form(name="searchForm", action="/search/0", method="get").navbar-search
+            input(type='text', name='searchInput', placeholder='Search').search-query.span2
+        ul.nav.pull-right
           li.dropdown
             a(href='#', data-toggle="dropdown").dropdown-toggle 
               != userName
@@ -27,5 +26,14 @@ div.navbar.navbar-fixed-top
               li
                 a(href='/profile') Sign out
 
-    
+script
+  $(function() {
+    // Setup drop down menu
+    $('.dropdown-toggle').dropdown();
+   
+    // Fix input element click problem
+    $('.dropdown input, .dropdown label').click(function(e) {
+      e.stopPropagation();
+    });
+  });
 != messages()

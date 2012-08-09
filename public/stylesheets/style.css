@@ -3,6 +3,11 @@
 html{
     overflow-y: auto;
 }
+
+.center{
+  text-align: center;
+}
+
 .timer {
   font-size: 250%;
   text-align: center;

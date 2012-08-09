@@ -1,5 +1,13 @@
-script 
-  $('.dropdown-toggle').dropdown()
+script
+  $(function() {
+    // Setup drop down menu
+    $('.dropdown-toggle').dropdown();
+   
+    // Fix input element click problem
+    $('.dropdown input, .dropdown label').click(function(e) {
+      e.stopPropagation();
+    });
+  });
 
 div.navbar.navbar-fixed-top
   div.navbar-inner
@@ -10,16 +18,27 @@ div.navbar.navbar-fixed-top
         span.icon-bar
       a(href='/home')#logo Proto Bowl
       div.nav-collapse.collapse
-        ul.nav.nav-pull-right
-          li
-            a(href='/home') Home
-          li
-            a(href='/search/0') Search
+        ul.nav
           li
             a(href='/multiplayer') Multiplayer
-          li
-            a(href='/login') Login
+          form(name="searchForm", action="/search/0", method="get").navbar-search
+            input(type='text', name='searchInput', placeholder='Search').search-query.span2
+        ul.nav.pull-right
           li
             a(href='/signup') Sign up
+          li.dropdown
+            a(href="#", data-toggle="dropdown").dropdown-toggle Sign In 
+              b.caret
+            ul(style="padding: 15px; padding-bottom: 0px;").dropdown-menu
+              form(action='/login', method='POST')
+                #login
+                  label(for=everyauth.password.loginFormFieldName) Username:
+                  input(type='text', name=everyauth.password.loginFormFieldName)
+                #password
+                  label(for=everyauth.password.passwordFormFieldName) Password:
+                  input(type='password', name=everyauth.password.passwordFormFieldName)
+                #submit
+                  input(type='submit').center.btn.btn-primary.btn-xlarge Login
 
+          
 != messages()

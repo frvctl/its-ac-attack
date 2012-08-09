@@ -6,16 +6,14 @@ module.exports = (app) ->
     res.render "users/signup", {
       title: "Sign Up"
     }
-
-  app.get "/login", (req, res) ->
-    res.render "users/login", {
-      title: "Login"
-    }
     
   app.get "/notAuthorized", (req, res) ->
     res.render "users/notAuthorized", { 
       title: "You are not Authorized"
     }
+
+  app.get "/settings", mid.userInformation, (req, res) ->
+    res.render "users/settings"
 
   app.get "/profile", mid.userInformation, (req, res) ->
     if req.loggedIn
