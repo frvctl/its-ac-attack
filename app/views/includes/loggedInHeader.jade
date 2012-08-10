@@ -1,3 +1,14 @@
+script
+  $(function() {
+    // Setup drop down menu
+    $('.dropdown-toggle').dropdown();
+   
+    // Fix input element click problem
+    $('.dropdown input, .dropdown label').click(function(e) {
+      e.stopPropagation();
+    });
+  });
+
 div.navbar.navbar-fixed-top
   div.navbar-inner
     div.container
@@ -26,14 +37,4 @@ div.navbar.navbar-fixed-top
               li
                 a(href='/profile') Sign out
 
-script
-  $(function() {
-    // Setup drop down menu
-    $('.dropdown-toggle').dropdown();
-   
-    // Fix input element click problem
-    $('.dropdown input, .dropdown label').click(function(e) {
-      e.stopPropagation();
-    });
-  });
 != messages()

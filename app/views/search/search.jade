@@ -1,8 +1,10 @@
 div#searchResultsDiv
-  div.row-fluid
+  div.row-fluid#contentContainer
      p
        if(question.length == 0)
-         != 'Use the search bar to search for Trivia Question'
+         != 'No Results Found Please Try A Different Query'
+         form(name="searchForm", action="/search/0", method="get").search-form
+            input(type='text', name='searchInput', placeholder='Search').search-query.span2
        else if(question.length < 10)
          != 'Displaying ' + question.length + ' of ' + question.length
        else 
