@@ -1,10 +1,4 @@
-div
-  form(name="searchForm", action="", method="get").center.well.search-form
-    div
-      input(type='text', name='searchInput', placeholder='Search').input-xlarge.search-query
-    button(type='submit', onclick="showDiv()").btn.btn-primary Search
-
-div(id="searchResultsDiv")
+div#searchResultsDiv
   div.row-fluid
      p
        if(question.length == 0)

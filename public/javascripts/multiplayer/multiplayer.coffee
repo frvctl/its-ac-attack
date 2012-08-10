@@ -423,17 +423,7 @@ renderPartial = ->
   unread = bundle.find('.readout .unread')
   old_spots = visible.data('spots') is spots.join(',')
   if new_text isnt old_text or !old_spots
-    # console.log words
-    # console.log spots
-    # change = new_text.slice old_text.length
-    # console.log change
-    # console.log new_text
-    # console.log old_text
-    # if new_text.indexOf(old_text.trim()) is 0 and old_spots and change.indexOf('*') is -1
-    #   visible.append(change)
-    #   unread.text words.slice(index).join(' ')
-    # else
-    # console.log 'redo'
+
     visible.data('spots', spots.join(','))
 
     # textnodes = (node for node in visible[0].childNodes when node.textContent not in [' ', ''])
@@ -478,16 +468,6 @@ renderPartial = ->
         unread.append elements[i].contents()
 
 
-
-  # if new_text isnt old_text
-  #   if new_text.indexOf(old_text) is 0
-  #     node = bundle.find('.readout .visible')[0]
-  #     change = new_text.slice old_text.length
-  #     node.appendChild document.createTextNode(change)
-  #   else
-  #     bundle.find('.readout .visible').text new_text
-  # bundle.find('.readout .unread').text words.slice(index).join(' ')
-  #render the time
   renderTimer()
 
 
@@ -663,10 +643,6 @@ createBundle = ->
   addInfo 'Category', sync.info.category
   addInfo 'Difficulty', sync.info.difficulty
   addInfo 'Tournament', sync.info.year + ' ' + sync.info.tournament
-  # addInfo 'Year', sync.info.year
-  # addInfo 'Number', sync.info.num
-  # addInfo 'Round', sync.info.round
-  # addInfo 'Report', ''
 
   breadcrumb.find('li').last().append $('<span>').addClass('divider').text('/')
   breadcrumb.append $('<li>').addClass('clickable').text('Report').click (e) ->
@@ -691,14 +667,8 @@ createBundle = ->
       e.stopPropagation()
       e.preventDefault()
 
-  # breadcrumb.append $('<li>').addClass('pull-right').append(star)
-
-
   breadcrumb.append $('<li>').addClass('pull-right').append(star)
   breadcrumb.append $('<li>').addClass('pull-right answer').text(sync.answer)
-
-
-
 
   readout = $('<div>').addClass('readout')
   well = $('<div>').addClass('well').appendTo(readout)
@@ -710,7 +680,6 @@ createBundle = ->
     .append(breadcrumb)
     .append(readout)
     .append(annotations)
-
 
 userSpan = (user) ->
   $('<span>')
@@ -730,7 +699,6 @@ addImportant = (el) ->
 guessAnnotation = ({session, text, user, done, correct, interrupt, early}) ->
   # TODO: make this less like chats
   id = user + '-' + session
-  # console.log id
   if $('#' + id).length > 0
     line = $('#' + id)
   else
@@ -779,7 +747,6 @@ guessAnnotation = ({session, text, user, done, correct, interrupt, early}) ->
 
     if actionMode is 'guess'
       setActionMode ''
-  # line.toggleClass 'typing', !done
 
 chatAnnotation = ({session, text, user, done, time}) ->
   id = user + '-' + session
@@ -813,7 +780,6 @@ sock.on 'leave', ({user}) ->
   line.append userSpan(user)
   line.append " left the room"
   addAnnotation line
-
 
 jQuery('.bundle .breadcrumb').live 'click', ->
   unless $(this).is jQuery('.bundle .breadcrumb').first()
@@ -857,8 +823,6 @@ $('.buzzbtn').click ->
   # and ask nicely for forgiveness otherwise
   sock.emit 'buzz', 'yay'
 
-
-
 $('.pausebtn').click ->
   removeSplash ->
     if !!sync.time_freeze
@@ -866,16 +830,12 @@ $('.pausebtn').click ->
     else
       sock.emit 'pause', 'yay'
 
-
 $('.chat_input').keydown (e) ->
   if e.keyCode in [47, 111, 191] and $(this).val().length is 0
     e.preventDefault()
 
-
 $('input').keydown (e) ->
   e.stopPropagation() #make it so that the event listener doesnt pick up on stuff
-
-
 
 $('.chat_input').keyup (e) ->
   return if e.keyCode is 13
@@ -901,7 +861,6 @@ $('.guess_input').keyup (e) ->
     done: false
   }
 
-
 $('.guess_form').submit (e) ->
   sock.emit 'guess', {
     text: $('.guess_input').val(), 
@@ -917,7 +876,6 @@ $('.prompt_input').keyup (e) ->
     done: false
   }
 
-
 $('.prompt_form').submit (e) ->
   sock.emit 'prompt', {
     text: $('.prompt_input').val(), 
@@ -925,7 +883,6 @@ $('.prompt_form').submit (e) ->
   }
   e.preventDefault()
   setActionMode ''
-
 
 $('body').keydown (e) ->
   if actionMode is 'chat'
@@ -950,15 +907,10 @@ $('body').keydown (e) ->
     e.preventDefault()
     $('.chatbtn').click()
 
-  # console.log e.keyCode
-
-
 $('.speed').change ->
   $('.speed').not(this).val($(this).val())
   rate = 1000 * 60 / 5 / Math.round($(this).val())
   sock.emit 'speed', rate
-  # console.log rate
-
 
 # possibly this should be replaced by something smarter using CSS calc()
 # but that would be a 
@@ -991,14 +943,12 @@ if !Modernizr.touch and !mobileLayout()
       if mobileLayout() then "error" else "left"
   })
 
-
 if Modernizr.touch
   $('.show-keyboard').hide()
   $('.show-touch').show()
 else
   $('.show-keyboard').show()
   $('.show-touch').hide()
-
 
 handleCacheEvent = ->
   status = applicationCache.status
@@ -1030,7 +980,7 @@ do -> # isolate variables from globals
       applicationCache.addEventListener name, handleCacheEvent
 
 # asynchronously load offline components
-#also, html5slider isnt actually for offline,
+# also, html5slider isnt actually for offline,
 # but it can be loaded async, so lets do that, 
 # and reuse all the crap that can be reused
 setTimeout ->
@@ -1039,7 +989,7 @@ setTimeout ->
   deps = ["html5slider", "levenshtein", "removeDiacritics", "answerparse", "syllable", "names", "offline"]
   loadNextResource = ->
     $.ajax {
-      url: "lib/#{deps.shift()}.js",
+      url: "../../public/javascripts/answer/#{deps.shift()}.js",
       cache: true,
       dataType: "script",
       success: ->

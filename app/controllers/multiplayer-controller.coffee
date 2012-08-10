@@ -296,7 +296,7 @@ module.exports = (app) ->
       room = rooms[room_name]
       room.add_socket publicID, sock.id
       unless 'name' of room.users[publicID]
-        room.users[publicID].name = require('../../public/javascripts/multiplayer/names').generateName()
+        room.users[publicID].name = require('../../public/javascripts/answer/names').generateName()
       fn {
         id: publicID,
         name: room.users[publicID].name

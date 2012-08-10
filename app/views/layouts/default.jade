@@ -4,10 +4,13 @@ html
     title= title
   != partial('../includes/head')
   body
-    .container
-      if loggedIn
-        != partial('../includes/loggedInHeader')
-      else
-        != partial('../includes/header')
-      != body
-    != partial('../includes/footer')
+    .wrapper
+      .container
+        if loggedIn
+          != partial('../includes/loggedInHeader')
+        else
+          != partial('../includes/header')
+        != body
+        #push
+    .footer
+      != partial('../includes/footer')

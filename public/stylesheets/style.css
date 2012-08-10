@@ -4,6 +4,14 @@ html{
     overflow-y: auto;
 }
 
+#contentContainer{
+  margin-top: 70px;
+}
+
+html, body {
+  height: 100%;
+}
+
 .center{
   text-align: center;
 }
@@ -126,9 +134,12 @@ form.expando {
 }
 
 body {
-    padding-top: 70px;
-    padding-bottom: 40px;
     font-family: sans-serif;
+    background-image: url('../images/derp.png');
+}
+
+.wrapper{
+  background-color: white;
 }
 
 .navbar .divider-vertical {margin: 0}
@@ -163,6 +174,7 @@ p {
 
 /* header */
 
+
 #logo {
     float: left;
     margin-right: 10px;
@@ -175,17 +187,14 @@ p {
     line-height: 1;
 }
 
-#logo:hover {
-    color: green;
-    text-decoration: none;
+#logo:hover{
+  color: white;
 }
 
 /* Footer */
 
 footer{
     width: 1170px;
-    margin-top: 45px;
-    padding-top: 5px;
     margin-left: auto;
     margin-right: auto;
     border-top: 1px solid #eaeaea;
@@ -218,6 +227,12 @@ footer ul li{
     visibility:hidden
 }
 
-.navbar-inner{
-  background-color: red;
+.wrapper {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  margin: 0 auto -4em;
+}
+.footer, .push {
+  height: 4em;
 }

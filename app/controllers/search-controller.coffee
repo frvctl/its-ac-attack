@@ -10,7 +10,7 @@ module.exports = (app) ->
     pg = req.params
     pgNum = parseInt(pg.searchNext, 10)
     nPerPage = 10
-    numToSkip = 1
+    numToSkip = pgNum*10
     loggedIn = req.loggedIn
     console.log(loggedIn)
     if searchIndx
@@ -30,13 +30,13 @@ module.exports = (app) ->
           tournament: 1
         ),(
           skip: numToSkip
-          limit: 1
+          limit: nPerPage
         ),((err, question) -> 
          res.render "search/search", {
            title: "Search",
            counter: pgNum,
            lesserIndx: (pgNum * 10),
-           greaterIndx: (pgNum * 10) + 10,
+           greaterIndx: ((pgNum * 10) + 10),
            question: question,
            loggedIn: req.loggedIn,
            userName: req.userName,

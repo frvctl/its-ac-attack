@@ -1049,7 +1049,7 @@
     deps = ["html5slider", "levenshtein", "removeDiacritics", "answerparse", "syllable", "names", "offline"];
     loadNextResource = function() {
       return $.ajax({
-        url: "lib/" + (deps.shift()) + ".js",
+        url: "../../public/javascripts/answer/" + (deps.shift()) + ".js",
         cache: true,
         dataType: "script",
         success: function() {
