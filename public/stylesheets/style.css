@@ -1,20 +1,32 @@
-/* universal */
+/* ----Universal---- */
 
-html{
-    overflow-y: auto;
+html, body {
+  height: 100%;
+  overflow-y: auto;
+  font-family: sans-serif;
+
 }
 
 #contentContainer{
   margin-top: 70px;
 }
 
-html, body {
-  height: 100%;
-}
-
 .center{
   text-align: center;
 }
+
+.hide{
+  visibility:hidden
+}
+
+.wrapper {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  margin: 0 auto -4em;
+}
+
+/* ----Multiplayer---- */
 
 .timer {
   font-size: 250%;
@@ -133,14 +145,7 @@ form.expando {
   transition: none;
 }
 
-body {
-    font-family: sans-serif;
-    background-image: url('../images/derp.png');
-}
-
-.wrapper{
-  background-color: white;
-}
+/* ----Navbar---- */
 
 .navbar .divider-vertical {margin: 0}
 .navbar .nav > li > a {padding: 10px 23px 11px 20px;}
@@ -172,8 +177,7 @@ p {
     line-height: 1.7em;
 }
 
-/* header */
-
+/* -----Header----- */
 
 #logo {
     float: left;
@@ -192,7 +196,7 @@ p {
   text-decoration: none;
 }
 
-/* Footer */
+/* ----Footer---- */
 
 footer{
     width: 1170px;
@@ -224,16 +228,6 @@ footer ul li{
     margin-left: 10px;
 }
 
-.hide{
-    visibility:hidden
-}
-
-.wrapper {
-  min-height: 100%;
-  height: auto !important;
-  height: 100%;
-  margin: 0 auto -4em;
-}
 .footer, .push {
   height: 4em;
 }
