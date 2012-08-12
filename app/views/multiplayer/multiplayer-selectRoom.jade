@@ -1,69 +1,72 @@
 h1 Select a Room
 
-#roomTable
-  table.table
-    thead
-      tr
-        th Channel Name
-        th Number of Users
-        th Game Mode
-        th Difficulty
-    tbody
-      each room, i in rooms
-        if Object.keys(room.users).length > 0 
-          tr
-            td 
-              a(href='/multiplayer/' + room.name)= room.name
-            td= Object.keys(room.users).length 
-            td= roomParams.difficulty
-            td= roomParams.gameMode
-hr
+#contentContainer
+  #roomTable
+    each room, i in rooms
+      if Object.keys(room.users).length > 0
+        table.table
+          thead
+            tr
+              th Channel Name
+              th Number of Users
+              th Game Mode
+              th Difficulty
+          tbody
+            tr
+              td 
+                a(href='/multiplayer/' + room.name)= room.name
+              td= Object.keys(room.users).length 
+              td= roomParams.difficulty
+              td= roomParams.gameMode
 
-form(actions='', method='get').form-horizontal.center#makeroom
-  label Name of Room
-  input(type='text', name='roomName').input-large
-  div#settings.btn.btn-primary Make the Room
+  hr
+   
+  form(actions='', method='get').center#makeroom
+    label Name of Room
+    input(type='text', name='roomName').input-large
+    br
+    div#settings.center.btn.btn-primary Make the Room
 
-div.modal.hide#settingsModal
-  div.modal-header
-    button.close(type="button", data-dismiss="modal") ×
-    h3 Channel Settings
-  div.modal-body
-    div#privacy
-      h4 Privacy
-      form.well
-        input(type='checkbox', name='privacy', value='private')
-        | Private
-        br
-        input(type='checkbox', name='public', value='public') 
-        | Public
-      hr
-    div#difficulty
-      h4 Difficulty
-      form.well
-        input(type='checkbox', name='easy', value='easy')
-        | Easy
-        br
-        input(type='checkbox', name='medium', value='medium') 
-        | Medium
-        br
-        input(type='checkbox', name='hard', value='hard') 
-        | Hard
-      hr
-    div#gameMode
-      h4 Game Mode
-      form.well
-        input(type='checkbox', name='blah') 
-        | Blah 1
-        br
-        input(type='checkbox', name='blah2')
-        | Blah 2
-        br
-        input(type='checkbox', name='blah3')
-        | Blah 3
+  div.modal.hide#settingsModal
+    div.modal-header
+      button.close(type="button", data-dismiss="modal") ×
+      h3 Channel Settings
+    div.modal-body
+      div#privacy
+        h4 Privacy
+        form.well
+          input(type='checkbox', name='privacy', value='private')
+          | Private
+          br
+          input(type='checkbox', name='public', value='public') 
+          | Public
+        hr
+      div#difficulty
+        h4 Difficulty
+        form.well
+          input(type='checkbox', name='easy', value='easy')
+          | Easy
+          br
+          input(type='checkbox', name='medium', value='medium') 
+          | Medium
+          br
+          input(type='checkbox', name='hard', value='hard') 
+          | Hard
+        hr
+      div#gameMode
+        h4 Game Mode
+        form.well
+          input(type='checkbox', name='blah') 
+          | Blah 1
+          br
+          input(type='checkbox', name='blah2')
+          | Blah 2
+          br
+          input(type='checkbox', name='blah3')
+          | Blah 3
 
 
-  div.modal-footer
-    a.btn.btn-primary(href="#", data-dismiss="modal") Done
+    div.modal-footer
+      a.btn.btn-primary(href="#", data-dismiss="modal") Done
 
 script(src='../../javascripts/multiplayer/lobby.js')

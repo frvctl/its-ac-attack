@@ -201,17 +201,9 @@ synchronize = (data) ->
   if sync.attempt
     if sync.attempt.user isnt public_id
       setActionMode '' if actionMode is 'guess'
-    # else
-    #   setActionMode 'guess' if actionMode isnt 'guess'
-
-  # if sync.time_offset isnt null
-  #   $('#time_offset').text(sync.time_offset.toFixed(1))
-
-
 
 sock.on 'sync', (data) ->
   synchronize(data)
-
 
 latency_log = []
 testLatency = ->
@@ -227,7 +219,6 @@ testLatency = ->
       latency_log.push CSC1
       latency_log.push SCS1
       latency_log.push CSC2
-      # console.log CSC1, SCS1, CSC2
 
 setTimeout ->
   testLatency()
@@ -322,13 +313,6 @@ renderState = ->
           $('.leaderboard tbody tr').not(this).popover 'hide'
           $(this).popover 'toggle'
 
-        # row.mouseover (e) ->
-        #   $('.leaderboard tbody tr').not(this).popover 'hide'
-        #   if $(this).data('popover'),$(this).data('popover').tip().hasClass('out')
-        #     $(this).popover 'show'
-        # row.mouseout (e) ->
-        #   console.log $(this).data('popover'),$(this).data('popover').tip().hasClass('in')
-        #   # $(this).popover 'hide'
       row.attr 'data-original-title', "<span class='user-#{user.id}'>#{user.name}</span>'s stats"
 
       row.attr 'data-content', $('<div>').append(createStatSheet(user, true)).html()
