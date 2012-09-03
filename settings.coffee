@@ -10,7 +10,7 @@ exports.boot = (app) ->
 
 bootApplication = (app) ->
   app.configure ->
-    app.use require('connect-assets')()
+    app.use require('connect-assets')({src: __dirname + "/app/assets"})
     app.set "views", __dirname + "/app/views"
     app.set "view engine", "jade"
     app.set "view options",
