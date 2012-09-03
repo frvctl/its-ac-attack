@@ -1,0 +1,33 @@
+development:
+  db:
+    uri: "mongodb://localhost/its-ac-attack_development"
+  facebook:
+    appId: "461813053838465"
+    appSecret: "c152ce37e26ac7cb9c757c412354349e"
+    host_uri: "localhost:3000"
+  twitter:
+    consumerKey: "1O7Wni1HOmTowvNVn9cXqw"
+    consumerSecret: "x6WmEPNyAF1YFvnEFZvnsJ3rCNeGCc6rMIGWcg8pKQ"
+    host_uri: "http://localhost:3000"
+staging:
+  db:
+    uri: "mongodb://localhost/noobjs_staging"
+  facebook:
+    appId: "202263326537254"
+    appSecret: "f12d943a863da7bd6d27823355769ec5"
+    host_uri: "http://localhost:3000"
+  twitter:
+    consumerKey: "1O7Wni1HOmTowvNVn9cXqw"
+    consumerSecret: "x6WmEPNyAF1YFvnEFZvnsJ3rCNeGCc6rMIGWcg8pKQ"
+    host_uri: "http://localhost:3000"
+production:
+  db:
+    uri: "mongodb://Morghra:jewlawl5@ds033767.mongolab.com:33767/its-ac-attack_production"
+  facebook:
+    appId: "461813053838465"
+    appSecret: "c152ce37e26ac7cb9c757c412354349e"
+    host_uri: "http://its-ac-attack.herokuapp.com"
+  twitter:
+    consumerKey: "1O7Wni1HOmTowvNVn9cXqw"
+    consumerSecret: "x6WmEPNyAF1YFvnEFZvnsJ3rCNeGCc6rMIGWcg8pKQ"
+    host_uri: "http://its-ac-attack.herokuapp.com"
