@@ -8,7 +8,7 @@ require('coffee-script');
 
 // Load configurations
 var config_file = require('yaml-config'),
-exports = module.exports = config = config_file.readConfig('config/config.yaml');
+exports = module.exports = config = config_file.readConfig('./config.yaml');
 
 require('./db-connect');                // Bootstrap db connection
 
